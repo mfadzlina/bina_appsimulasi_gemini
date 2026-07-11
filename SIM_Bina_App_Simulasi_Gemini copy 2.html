@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SIM — Mudahnya Bina App Simulasi dengan Gemini</title>
+<style>
+:root{--royal:#2554e6;--royal-deep:#1538b5;--royal-mid:#3f72f7;--royal-light:#e7eefe;--royal-soft:#f3f7ff;--gold:#f6a623;--ink:#15213f;--muted:#5c6a88;--line:#dbe5f9;--white:#fff;--good:#1f9d57;--good-bg:#e7f6ee;--warn:#c47a08;--warn-bg:#fdf3e0;--bad:#d93b3b;--bad-bg:#fdeaea;--shadow:0 8px 26px rgba(21,56,181,.10)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--royal-soft);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}h1,h2,h3{line-height:1.25;margin:0 0 .4em}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:0;background:var(--royal-deep);color:#fff;padding:10px 16px;z-index:100}.skip:focus{left:0}
+.app{display:flex;min-height:100vh}
+.sidebar{width:312px;flex:0 0 312px;background:var(--royal-deep);color:#fff;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:40;transition:transform .25s}
+.brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.15)}
+.logo{display:flex;flex-direction:column;align-items:center;gap:7px;background:#fff;border-radius:10px;padding:11px 14px}
+.logo img{display:block;width:100%;max-width:230px;height:auto}
+.brand .code{margin-top:12px;font-size:11.5px;letter-spacing:.12em;color:#b9c8f5;font-weight:700}
+.brand .ttl{font-size:17px;font-weight:800;margin-top:3px}
+.brand .tag{font-size:12px;color:#cdd8f7;font-style:italic;margin-top:3px}
+.progwrap{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.15)}
+.progwrap .lbl{font-size:11px;letter-spacing:.07em;color:#b9c8f5;text-transform:uppercase;font-weight:700;display:flex;justify-content:space-between}
+.progbar{height:9px;background:rgba(255,255,255,.18);border-radius:99px;margin-top:8px;overflow:hidden}
+.progbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fa6ff,#ffd27a);border-radius:99px;transition:width .4s}
+nav.menu{padding:8px 0 30px}
+nav.menu .grp{padding:14px 20px 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#94a7e6;font-weight:700}
+nav.menu button{width:100%;display:flex;align-items:center;gap:10px;padding:9px 20px;color:#dde5fb;background:transparent;border:0;border-left:3px solid transparent;cursor:pointer;text-align:left;font-size:14px}
+nav.menu button .ic{width:26px;height:26px;flex:0 0 26px;border-radius:7px;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:12px;font-weight:800}
+nav.menu button:hover{background:rgba(255,255,255,.08)}
+nav.menu button.active{background:rgba(255,255,255,.14);border-left-color:var(--gold);color:#fff;font-weight:700}
+.main{flex:1;min-width:0}
+.topbar{display:none;background:var(--royal-deep);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:50;align-items:center;gap:12px}
+.topbar button{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700}
+.wrap{max-width:1000px;margin:0 auto;padding:34px 30px 80px}
+section{display:none}section.show{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero{background:linear-gradient(135deg,var(--royal-deep),var(--royal-mid));color:#fff;border-radius:18px;padding:38px 36px;box-shadow:var(--shadow)}
+.hero .kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#ffd27a}
+.hero h1{font-size:31px;margin:.35em 0 .4em}
+.hero p{max-width:640px;color:#e3ebff;margin:.2em 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.pill{display:inline-block;background:var(--royal-light);color:var(--royal-deep);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:700;margin:2px 4px 2px 0}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--royal);color:#fff;border:0;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--royal-deep)}
+.btn.ghost{background:#fff;color:var(--royal-deep);border:2px solid var(--royal)}
+.btn.gold{background:var(--gold);color:#3a2a05}
+.btn.sm{padding:7px 14px;font-size:14px;border-radius:8px}
+.note{background:var(--warn-bg);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:15px}
+.good{background:var(--good-bg);border-left:4px solid var(--good);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:15px}
+.badx{background:var(--bad-bg);border-left:4px solid var(--bad);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:15px}
+.step{border:1px solid var(--line);border-radius:14px;background:#fff;margin:16px 0;box-shadow:var(--shadow);overflow:hidden}
+.step-h{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;background:#fff;border:0;width:100%;text-align:left}
+.step-h:hover{background:var(--royal-soft)}
+.step-num{width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:var(--royal-light);color:var(--royal-deep);display:grid;place-items:center;font-weight:800;font-size:17px}
+.step.done .step-num{background:var(--good);color:#fff}
+.step-t{flex:1}.step-t b{display:block;font-size:16.5px}.step-t span{font-size:13px;color:var(--muted)}
+.chev{color:var(--muted);transition:transform .25s}
+.step.open .chev{transform:rotate(180deg)}
+.step-b{display:none;padding:4px 22px 20px;border-top:1px solid var(--line)}
+.step.open .step-b{display:block}
+.qbox{background:var(--royal-soft);border:1px dashed var(--royal-mid);border-radius:10px;padding:13px 16px;margin:12px 0}
+.qbox b{color:var(--royal-deep)}
+.qbox ul{margin:.4em 0 0;padding-left:20px}
+.donebtn{margin-top:12px}
+.step.done .donebtn{background:var(--good)}
+label.f{display:block;font-weight:700;font-size:14.5px;margin:14px 0 5px;color:var(--royal-deep)}
+label.f small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+input[type=text],textarea,select{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:10px 12px;background:#fff;color:var(--ink)}
+textarea{min-height:74px;resize:vertical}
+input[type=text]:focus,textarea:focus{border-color:var(--royal-mid)}
+.chk{display:flex;align-items:flex-start;gap:9px;margin:7px 0;font-size:15px}
+.chk input{margin-top:4px;accent-color:var(--royal)}
+pre.prompt{background:#101a38;color:#e8eeff;border-radius:12px;padding:20px;white-space:pre-wrap;font-size:13.5px;line-height:1.6;max-height:460px;overflow:auto}
+.quiz-q{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:#fff}
+.quiz-q h3{font-size:15.5px}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;margin:4px 0}
+.opt:hover{background:var(--royal-soft)}
+.opt input{margin-top:4px;accent-color:var(--royal)}
+.fb{display:none;margin-top:10px;font-size:14.5px;border-radius:8px;padding:10px 13px}
+.fb.ok{display:block;background:var(--good-bg);color:var(--good)}
+.fb.no{display:block;background:var(--bad-bg);color:var(--bad)}
+.score{font-size:18px;font-weight:800;color:var(--royal-deep)}
+table.rt{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0}
+table.rt th,table.rt td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+table.rt th{background:var(--royal-light);color:var(--royal-deep)}
+.footer{margin-top:34px;color:var(--muted);font-size:13px;text-align:center}
+@media(max-width:920px){.sidebar{position:fixed;transform:translateX(-100%);height:100vh}.sidebar.openm{transform:none}.topbar{display:flex}.wrap{padding:22px 16px 70px}}
+@media print{.sidebar,.topbar,.no-print{display:none!important}.wrap{max-width:none;padding:0}section{display:none!important}#report{display:block!important}.card{box-shadow:none;border:1px solid #999;break-inside:avoid}pre.prompt{background:#fff;color:#000;border:1px solid #999;max-height:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Langkau ke kandungan</a>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="logo"><img src="data:image/jpeg;base64,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" alt="Logo TVETMARA Kuantan"></div>
+    <div class="code">SIM · PERKONGSIAN PdP DIGITAL</div>
+    <div class="ttl">Mudahnya Bina App Simulasi dengan Gemini</div>
+    <div class="tag">Fikir dahulu, prompt kemudian — app terhasil.</div>
+  </div>
+  <div class="progwrap">
+    <div class="lbl"><span>Kemajuan anda</span><span id="pct">0%</span></div>
+    <div class="progbar"><i id="pbar"></i></div>
+  </div>
+  <nav class="menu" aria-label="Menu utama">
+    <div class="grp">Mula</div>
+    <button data-sec="welcome" class="active"><span class="ic">⌂</span> Selamat datang</button>
+    <button data-sec="intro"><span class="ic">↗</span> Pengenalan &amp; Formula S.I.M.</button>
+    <div class="grp">Laluan pembelajaran</div>
+    <span id="stepnav"></span>
+    <div class="grp">Praktik</div>
+    <button data-sec="builder"><span class="ic">✍</span> Bina prompt anda</button>
+    <button data-sec="quiz"><span class="ic">?</span> Semak kefahaman</button>
+    <div class="grp">Hasil</div>
+    <button data-sec="report"><span class="ic">▤</span> Pelan &amp; cetak</button>
+  </nav>
+</aside>
+<div class="main">
+  <div class="topbar"><button onclick="toggleMenu()" aria-label="Buka menu">☰ Menu</button><b>SIM · Bina App Simulasi</b></div>
+  <main class="wrap" id="main">
+
+  <!-- ============ WELCOME ============ -->
+  <section id="welcome" class="show">
+    <div class="hero">
+      <div class="kick">Sesi perkongsian · 45 minit</div>
+      <h1>Daripada idea PdP kepada app simulasi — tanpa menulis kod</h1>
+      <p>Alat AI seperti <b>Gemini Canvas</b> boleh menjana aplikasi simulasi interaktif untuk kelas anda dalam beberapa minit. Rahsianya bukan pada AI — tetapi pada <b>cara anda berfikir sebelum menulis prompt</b>.</p>
+      <p style="margin-top:18px"><button class="btn gold" onclick="go('intro')">Mula laluan →</button></p>
+    </div>
+    <div class="card" id="regcard">
+      <h3>👤 Daftar dahulu (untuk rekod penyertaan)</h3>
+      <div class="grid2">
+        <div><label class="f" for="reg-nama">Nama</label><input type="text" id="reg-nama" placeholder="Nama penuh anda"></div>
+        <div><label class="f" for="reg-inst">Program / Institusi</label><input type="text" id="reg-inst" placeholder="Cth: JTE, TVETMARA Kuantan"></div>
+      </div>
+      <p style="margin-top:12px"><button class="btn" onclick="saveReg()">Simpan &amp; mula</button></p>
+      <p style="font-size:12.5px;color:var(--muted);margin:.4em 0 0">Maklumat ini direkodkan untuk tujuan laporan penyertaan sesi sahaja.</p>
+    </div>
+    <div class="good" id="regdone" style="display:none"></div>
+    <div class="grid3">
+      <div class="card"><h3>🎯 Apa anda akan capai</h3><p style="font-size:14.5px">Satu <b>prompt lengkap</b> yang sedia ditampal ke Gemini Canvas untuk menjana app simulasi bagi topik anda sendiri.</p></div>
+      <div class="card"><h3>🧭 Bagaimana</h3><p style="font-size:14.5px">Ikut <b>6 langkah berfikir</b> secara berpandu, kemudian gunakan <b>penjana prompt</b> dalam app ini.</p></div>
+      <div class="card"><h3>🖨 Bukti pembelajaran</h3><p style="font-size:14.5px">Cetak atau simpan <b>pelan app simulasi</b> anda sebagai rekod dan rujukan sesi PdP.</p></div>
+    </div>
+    <div class="note"><b>Keperluan:</b> laptop/telefon dengan pelayar web dan akaun Google. Layari <b>gemini.google.com</b> dan pastikan anda boleh log masuk sebelum sesi bermula.</div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section id="intro">
+    <h1>Pengenalan: Kenapa app simulasi &amp; apa itu Gemini Canvas?</h1>
+    <div class="card">
+      <h2>💡 Kenapa simulasi dalam PdP?</h2>
+      <p>Sesetengah konsep sukar diajar dengan slaid statik — terlalu <b>abstrak</b> (arus elektrik, kadar tindak balas), terlalu <b>berbahaya</b> (voltan tinggi, bahan kimia), terlalu <b>mahal</b> (mesin industri), atau terlalu <b>perlahan/pantas</b> untuk diperhatikan. Simulasi membenarkan pelajar <b>mencuba, tersilap dan memerhati kesan</b> — tanpa risiko dan tanpa kos.</p>
+      <div class="grid2">
+        <div class="good"><b>Sesuai disimulasikan:</b> hubungan sebab-akibat (ubah X, lihat Y), prosedur berlangkah, membuat keputusan senario, konsep abstrak yang boleh divisualkan.</div>
+        <div class="badx"><b>Kurang sesuai:</b> fakta hafalan semata-mata, kandungan yang lebih baik dipelajari secara hands-on sebenar di bengkel/makmal.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🧩 Apa itu Gemini Canvas?</h2>
+      <p><b>Gemini Canvas</b> ialah ciri dalam Gemini (gemini.google.com) yang boleh menjana dan memaparkan <b>aplikasi web interaktif</b> terus daripada arahan bahasa biasa. Anda menulis prompt, Gemini menulis kod, dan app terus boleh dicuba, dikongsi atau dimuat turun sebagai satu fail HTML.</p>
+      <p><span class="pill">1 · Buka gemini.google.com</span><span class="pill">2 · Pilih Canvas</span><span class="pill">3 · Tampal prompt</span><span class="pill">4 · Uji &amp; minta penambahbaikan</span><span class="pill">5 · Kongsi / muat turun</span></p>
+      <div class="note"><b>Prinsip utama:</b> Kualiti app = kualiti prompt. Prompt yang kabur menghasilkan app yang kabur. Sebab itulah kita <b>berfikir dahulu</b>.</div>
+    </div>
+    <div class="card">
+      <h2>🔑 Formula S.I.M. — kerangka berfikir sebelum prompt</h2>
+      <table class="rt">
+        <tr><th style="width:90px">Huruf</th><th>Maksud</th><th>Soalan teras</th></tr>
+        <tr><td><b>S</b></td><td><b>Sasaran</b> — hasil pembelajaran &amp; profil pelajar</td><td>Selepas menggunakan app ini, apakah yang pelajar saya <i>boleh buat</i>?</td></tr>
+        <tr><td><b>I</b></td><td><b>Interaksi</b> — apa yang pelajar boleh ubah, cuba &amp; uji</td><td>Apakah yang pelajar <i>lakukan</i> dalam app — bukan sekadar baca?</td></tr>
+        <tr><td><b>M</b></td><td><b>Maklum balas</b> — bagaimana app membalas tindakan pelajar</td><td>Bagaimana pelajar <i>tahu</i> mereka faham atau tersilap?</td></tr>
+      </table>
+      <p style="font-size:14.5px;color:var(--muted)">Enam langkah dalam laluan pembelajaran seterusnya mengembangkan Formula S.I.M. ini kepada pelan lengkap.</p>
+      <p><button class="btn" onclick="go('step0')">Mula Langkah 1 →</button></p>
+    </div>
+  </section>
+
+  <!-- ============ BUILDER ============ -->
+  <section id="builder">
+    <h1>✍ Bina prompt anda</h1>
+    <p style="color:var(--muted)">Isi ruangan di bawah berdasarkan jawapan anda dalam 6 langkah tadi. App ini akan menyusunnya menjadi prompt lengkap untuk Gemini Canvas.</p>
+    <div class="card">
+      <h2>Langkah 1–2 · Sasaran &amp; konsep</h2>
+      <label class="f" for="f-topik">Topik / konsep yang hendak disimulasikan <small>Cth: Litar siri vs selari · Nisbah bancuhan konkrit · Kitaran penyejukan aircond</small></label>
+      <input type="text" id="f-topik" placeholder="Topik anda...">
+      <label class="f" for="f-pelajar">Profil pelajar <small>Cth: Pelajar Sijil Teknologi Elektrik semester 2, TVETMARA Kuantan</small></label>
+      <input type="text" id="f-pelajar" placeholder="Siapa pelajar anda...">
+      <label class="f" for="f-hasil">Hasil pembelajaran (1–3) <small>Guna kata kerja boleh diperhatikan: membezakan, mengira, memilih, menyusun...</small></label>
+      <textarea id="f-hasil" placeholder="Selepas menggunakan app ini, pelajar dapat..."></textarea>
+      <label class="f" for="f-sukar">Salah faham / bahagian sukar yang app perlu bantu selesaikan <small>Cth: Pelajar keliru — sangka arus sama dalam semua jenis litar</small></label>
+      <textarea id="f-sukar" placeholder="Apa yang pelajar selalu keliru..."></textarea>
+    </div>
+    <div class="card">
+      <h2>Langkah 3 · Interaksi</h2>
+      <label class="f" for="f-ubah">Apa yang pelajar boleh ubah / lakukan? <small>Cth: Slider nilai perintang 10–100Ω, butang tukar jenis litar, pilih komponen</small></label>
+      <textarea id="f-ubah" placeholder="Pelajar boleh mengubah..."></textarea>
+      <label class="f" for="f-papar">Apa yang dipaparkan dan berubah serta-merta? <small>Cth: Gambar rajah litar, bacaan arus &amp; voltan, graf, animasi aliran</small></label>
+      <textarea id="f-papar" placeholder="Skrin akan memaparkan..."></textarea>
+    </div>
+    <div class="card">
+      <h2>Langkah 4 · Maklum balas &amp; penilaian</h2>
+      <div class="chk"><input type="checkbox" id="c-explain" checked><label for="c-explain">Penerangan automatik “apa yang berlaku &amp; kenapa” setiap kali pelajar mengubah sesuatu</label></div>
+      <div class="chk"><input type="checkbox" id="c-quiz" checked><label for="c-quiz">Kuiz semak kefahaman (5 soalan objektif) dengan maklum balas serta-merta</label></div>
+      <div class="chk"><input type="checkbox" id="c-score"><label for="c-score">Skor / markah dan mesej galakan</label></div>
+      <div class="chk"><input type="checkbox" id="c-miskonsepsi" checked><label for="c-miskonsepsi">Mesej khas menegur salah faham lazim (seperti yang dinyatakan di atas)</label></div>
+    </div>
+    <div class="card">
+      <h2>Langkah 5 · Struktur &amp; rupa</h2>
+      <div class="chk"><input type="checkbox" id="c-intro" checked><label for="c-intro">Skrin pengenalan (tajuk, objektif, arahan penggunaan)</label></div>
+      <div class="chk"><input type="checkbox" id="c-rumusan" checked><label for="c-rumusan">Skrin rumusan pada akhir (isi penting + refleksi)</label></div>
+      <div class="chk"><input type="checkbox" id="c-mobile" checked><label for="c-mobile">Mesra telefon (responsive) — pelajar guna telefon di kelas</label></div>
+      <label class="f" for="f-gaya">Gaya &amp; warna (pilihan) <small>Cth: Warna biru royal &amp; emas TVETMARA, moden dan bersih</small></label>
+      <input type="text" id="f-gaya" placeholder="Biru royal dan emas, gaya moden...">
+      <label class="f" for="f-bahasa">Bahasa app</label>
+      <select id="f-bahasa"><option>Bahasa Melayu</option><option>Bahasa Inggeris</option><option>Dwibahasa (BM + BI)</option></select>
+    </div>
+    <p class="no-print">
+      <button class="btn" onclick="makePrompt()">⚡ Jana prompt saya</button>
+      <button class="btn ghost" onclick="clearAll()">Kosongkan semula</button>
+    </p>
+    <div id="promptout" style="display:none">
+      <div class="card">
+        <h2>🎉 Prompt anda sedia!</h2>
+        <pre class="prompt" id="ptext"></pre>
+        <p class="no-print" style="margin-top:14px">
+          <button class="btn gold" onclick="copyPrompt()" id="copybtn">📋 Salin prompt</button>
+          <a class="btn ghost" href="https://gemini.google.com" target="_blank" rel="noopener">Buka Gemini Canvas ↗</a>
+          <button class="btn ghost" onclick="go('report')">Lihat pelan penuh →</button>
+        </p>
+        <div class="note"><b>Selepas menampal:</b> uji app seperti seorang pelajar. Ada yang tak kena? Balas terus kepada Gemini, cth: <i>“Besarkan saiz butang”, “Tambah satu soalan tentang X”, “Tukar bahasa penerangan supaya lebih mudah”</i>. Iterasi ialah sebahagian daripada proses!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz">
+    <h1>? Semak kefahaman</h1>
+    <p style="color:var(--muted)">5 soalan ringkas. Jawab, kemudian klik <b>Semak jawapan</b>.</p>
+    <div id="quizbox"></div>
+    <p class="no-print"><button class="btn" onclick="checkQuiz()">Semak jawapan</button></p>
+    <div class="card" id="quizres" style="display:none"><span class="score" id="scoretxt"></span><p id="scoremsg" style="margin:.4em 0 0"></p></div>
+  </section>
+
+  <!-- ============ REPORT ============ -->
+  <section id="report">
+    <h1>▤ Pelan App Simulasi Anda</h1>
+    <div class="card">
+      <h2 id="r-topik">—</h2>
+      <table class="rt">
+        <tr><th style="width:220px">Perkara</th><th>Butiran</th></tr>
+        <tr><td>Pelajar sasaran</td><td id="r-pelajar">—</td></tr>
+        <tr><td>Hasil pembelajaran</td><td id="r-hasil">—</td></tr>
+        <tr><td>Salah faham disasar</td><td id="r-sukar">—</td></tr>
+        <tr><td>Interaksi pelajar</td><td id="r-ubah">—</td></tr>
+        <tr><td>Paparan dinamik</td><td id="r-papar">—</td></tr>
+        <tr><td>Maklum balas</td><td id="r-fb">—</td></tr>
+        <tr><td>Struktur &amp; gaya</td><td id="r-struktur">—</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Prompt akhir</h2>
+      <pre class="prompt" id="r-prompt">Belum dijana. Pergi ke “Bina prompt anda” dahulu.</pre>
+    </div>
+    <div class="card">
+      <h2>✅ Senarai semak sebelum guna dalam PdP</h2>
+      <div class="chk"><input type="checkbox" id="s1"><label for="s1">Saya sudah uji app seperti pelajar — semua butang &amp; interaksi berfungsi</label></div>
+      <div class="chk"><input type="checkbox" id="s2"><label for="s2">Fakta, unit dan istilah teknikal dalam app disemak dan tepat</label></div>
+      <div class="chk"><input type="checkbox" id="s3"><label for="s3">Bahasa sesuai dengan tahap pelajar saya</label></div>
+      <div class="chk"><input type="checkbox" id="s4"><label for="s4">Saya tahu bila app ini digunakan dalam sesi (set induksi / latihan / pengukuhan)</label></div>
+      <div class="chk"><input type="checkbox" id="s5"><label for="s5">Pautan kongsi / fail HTML sudah diuji pada peranti pelajar</label></div>
+    </div>
+    <p class="no-print"><button class="btn" onclick="window.print()">🖨 Cetak / Simpan PDF</button></p>
+    <div class="footer">SIM · Mudahnya Bina App Simulasi dengan Gemini · Jawatankuasa Pemantapan PdP PAK21 · TVETMARA Kuantan</div>
+  </section>
+
+  </main>
+</div>
+</div>
+<script>
+/* ================= PENJEJAKAN (APPS SCRIPT) =================
+   Tampal URL Web App Apps Script anda di antara tanda petik.
+   Biarkan kosong ('') untuk mematikan penjejakan.            */
+var TRACK_URL='https://script.google.com/macros/s/AKfycbyY62M3G3VFDk0EAaFPIX4ARZ9Bw_T49GKRzRXzkcQIog3qWjE_uWB4mIUN5wrmbiCD/exec';
+/* ============================================================ */
+/* ================= DATA: 6 LANGKAH ================= */
+var STEPS=[
+{t:'Kenal pasti Sasaran',ms:'Hasil pembelajaran & profil pelajar (S dalam S.I.M.)',time:'± 3 minit',
+why:'App yang baik bermula dengan kesudahan: apakah yang pelajar boleh BUAT selepas menggunakannya? Tanpa sasaran yang jelas, Gemini akan menjana app yang cantik tetapi tidak mengajar apa-apa.',
+q:['Apakah topik dan hasil pembelajaran khusus? Gunakan kata kerja boleh diperhatikan (membezakan, mengira, memilih, menyusun).','Siapa pelajar anda — program, semester, pengetahuan sedia ada?','Bila app ini akan digunakan — set induksi, latihan berpandu, atau pengukuhan?'],
+example:'EET: “Pelajar Sijil Teknologi Elektrik semester 2 dapat membezakan kesan perubahan rintangan terhadap arus dalam litar siri berbanding litar selari.” · Bangunan: “Pelajar dapat memilih nisbah bancuhan konkrit yang betul mengikut kegunaan struktur.”',
+avoid:'Sasaran kabur seperti “pelajar memahami litar” — “memahami” tidak boleh diperhatikan dan tidak membantu Gemini mereka interaksi yang betul.'},
+{t:'Pilih konsep yang berbaloi disimulasikan',ms:'Fokus pada yang sukar, abstrak, berbahaya atau mahal',time:'± 3 minit',
+why:'Bukan semua kandungan perlu jadi simulasi. Nilai simulasi paling tinggi apabila pelajar dapat MENCUBA sesuatu yang mustahil, mahal atau berbahaya dilakukan secara fizikal — atau melihat sesuatu yang abstrak menjadi nyata.',
+q:['Apakah bahagian topik ini yang pelajar paling kerap salah faham?','Apakah yang TIDAK dapat ditunjukkan dengan slaid statik atau lakaran papan putih?','Adakah hubungan sebab-akibat yang boleh diterokai? (ubah X → lihat kesan pada Y)'],
+example:'EET: Arus tidak nampak — tetapi simulasi boleh animasikan aliran elektron dan tunjukkan meter berubah serta-merta. · Bangunan: Kesilapan nisbah bancuhan hanya kelihatan selepas konkrit gagal — simulasi tunjuk kesannya serta-merta tanpa risiko.',
+avoid:'Menyimulasikan fakta hafalan (cth: senarai definisi) — itu lebih sesuai jadi kad imbas, bukan simulasi.'},
+{t:'Reka Interaksi',ms:'Apa pelajar boleh ubah, cuba & uji (I dalam S.I.M.)',time:'± 4 minit',
+why:'Interaksi ialah jantung simulasi. Jika pelajar hanya membaca dan menekan “Seterusnya”, itu slaid — bukan simulasi. Tentukan dengan spesifik apa yang boleh diubah dan apa yang berlaku apabila diubah.',
+q:['Apakah pemboleh ubah yang pelajar boleh kawal? (slider, kotak input, butang pilihan)','Apakah yang dipaparkan dan berubah serta-merta? (rajah, meter, graf, animasi)','Adakah senario atau cabaran? (cth: “capai arus 2A dengan bajet komponen terhad”)'],
+example:'EET: Slider rintangan R1 &amp; R2 (10–100Ω), butang togol “Siri / Selari”, paparan ammeter &amp; voltmeter yang berubah serta-merta, animasi kelajuan aliran arus. · Bangunan: Slider nisbah simen:pasir:batu, paparan kekuatan konkrit &amp; kos, amaran jika nisbah tidak sesuai.',
+avoid:'Terlalu banyak interaksi serentak. 2–3 pemboleh ubah yang bermakna lebih baik daripada 10 butang yang mengelirukan.'},
+{t:'Tentukan Maklum balas & penilaian',ms:'Bagaimana pelajar tahu mereka faham (M dalam S.I.M.)',time:'± 4 minit',
+why:'Maklum balas serta-merta ialah kelebihan terbesar simulasi berbanding buku teks. Setiap tindakan pelajar patut mendapat respons yang MENGAJAR — bukan sekadar “betul/salah”.',
+q:['Apabila pelajar mengubah sesuatu, adakah app menerangkan APA yang berlaku dan KENAPA?','Bagaimana kefahaman disemak? (kuiz, cabaran, ramalan-kemudian-uji)','Bagaimana app menangani salah faham lazim yang anda kenal pasti di Langkah 2?'],
+example:'EET: Apabila pelajar menambah perintang dalam litar selari dan arus jumlah MENINGKAT, app memaparkan: “Perhatikan! Berbeza dengan litar siri, menambah laluan selari mengurangkan jumlah rintangan...” diikuti kuiz ramalan 5 soalan.',
+avoid:'Maklum balas “Betul! / Salah!” tanpa penerangan — pelajar meneka sehingga betul tanpa belajar apa-apa.'},
+{t:'Tetapkan Struktur & rupa',ms:'Skrin, bahasa, gaya dan aksesibiliti',time:'± 3 minit',
+why:'Struktur yang jelas menjadikan app mudah digunakan tanpa penerangan panjang. Nyatakan juga bahasa dan gaya visual — jika tidak, Gemini akan memilih sendiri (biasanya dalam Bahasa Inggeris!).',
+q:['Apakah aliran skrin? (cth: Pengenalan → Simulasi → Kuiz → Rumusan)','Apakah bahasa app? Adakah istilah teknikal perlu dikekalkan dalam BI?','Peranti pelajar — telefon atau komputer? (nyatakan “mesra telefon / responsive”)'],
+example:'“App dalam Bahasa Melayu, istilah teknikal elektrik dikekalkan dalam BI. 4 skrin: Pengenalan → Simulasi → Kuiz → Rumusan. Warna biru royal dan emas. Mesra telefon.”',
+avoid:'Membiarkan bahasa dan struktur ditentukan AI — hasilnya tidak konsisten dengan budaya bilik darjah anda.'},
+{t:'Tulis, uji & iterasi',ms:'Jana prompt → tampal di Gemini Canvas → uji → perbaiki',time:'± 8 minit',
+why:'Prompt pertama jarang sempurna — dan itu normal! Kekuatan Gemini Canvas ialah anda boleh terus meminta perubahan dalam bahasa biasa sehingga app benar-benar menepati kelas anda.',
+q:['Sudahkah semua jawapan Langkah 1–5 dimasukkan ke dalam penjana prompt?','Selepas app terjana: uji seperti pelajar. Apa yang mengelirukan? Apa yang salah fakta?','Apakah 1–2 penambahbaikan pertama yang anda akan minta daripada Gemini?'],
+example:'Iterasi biasa: “Besarkan tulisan pada meter”, “Tambah butang reset”, “Soalan kuiz no. 3 terlalu mudah — gantikan dengan soalan pengiraan”, “Tukar penerangan supaya sesuai untuk pelajar semester 1”.',
+avoid:'Berputus asa selepas cubaan pertama, ATAU menerima app tanpa menyemak ketepatan fakta — AI boleh tersilap kandungan teknikal.'}
+];
+/* ================= DATA: KUIZ ================= */
+var QUIZ=[
+{q:'Apakah perkara PERTAMA yang perlu ditentukan sebelum menulis prompt app simulasi?',
+o:['Warna dan gaya visual app','Hasil pembelajaran dan profil pelajar','Jenis slider yang hendak digunakan','Nama app yang menarik'],a:1,
+fb:'Betul! Sasaran (S) didahulukan — hasil pembelajaran menentukan segala reka bentuk yang lain.'},
+{q:'Antara berikut, konsep manakah PALING berbaloi dijadikan simulasi?',
+o:['Senarai definisi istilah elektrik','Sejarah penubuhan institusi','Kesan perubahan voltan terhadap arus — abstrak dan tak dapat dilihat mata','Nama-nama alat tangan di bengkel'],a:2,
+fb:'Tepat! Simulasi paling bernilai untuk konsep abstrak, berbahaya, mahal, atau hubungan sebab-akibat yang boleh diterokai.'},
+{q:'Apakah ciri prompt yang JELAS untuk Gemini Canvas?',
+o:['Pendek — cukup sekadar “buat app tentang litar elektrik”','Menyatakan siapa pelajar, apa interaksi, apa maklum balas, dan bahasa app','Menggunakan istilah teknikal pengaturcaraan seperti JavaScript dan CSS','Meminta seberapa banyak ciri yang boleh dalam satu app'],a:1,
+fb:'Betul! Prompt jelas = spesifik tentang Sasaran, Interaksi, Maklum balas dan struktur. Anda tidak perlu tahu istilah pengaturcaraan.'},
+{q:'Maklum balas yang BAIK dalam app simulasi ialah...',
+o:['“Betul!” atau “Salah!” sahaja supaya ringkas','Skor akhir sahaja pada penghujung','Penerangan apa yang berlaku dan kenapa, setiap kali pelajar bertindak','Muzik dan animasi meriah tanpa teks'],a:2,
+fb:'Tepat! Maklum balas yang mengajar menerangkan APA dan KENAPA — bukan sekadar betul/salah.'},
+{q:'Selepas Gemini menjana app pertama anda, apakah tindakan terbaik?',
+o:['Terus kongsi kepada pelajar — AI sentiasa tepat','Uji seperti pelajar, semak ketepatan fakta, dan minta penambahbaikan daripada Gemini','Padam dan tulis semula prompt dari kosong jika ada kekurangan','Tukar kepada alat AI lain'],a:1,
+fb:'Betul! Uji → semak fakta → iterasi. Balas terus kepada Gemini dalam bahasa biasa untuk memperbaiki app.'}
+];
+/* ================= STATE ================= */
+var state={};
+try{state=JSON.parse(localStorage.getItem('simGemini')||'{}')}catch(e){state={}}
+state.done=state.done||[false,false,false,false,false,false];
+state.quizDone=state.quizDone||false;state.promptDone=state.promptDone||false;
+function save(){try{localStorage.setItem('simGemini',JSON.stringify(state))}catch(e){}}
+/* ================= TRACK ================= */
+function track(ev,data){
+if(!TRACK_URL)return;
+var payload={ev:ev,nama:state.nama||'',institusi:state.inst||'',data:data||'',masa:new Date().toISOString()};
+try{fetch(TRACK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})}catch(e){}
+}
+function saveReg(){
+var n=document.getElementById('reg-nama').value.trim();
+var i=document.getElementById('reg-inst').value.trim();
+if(!n){alert('Sila isi nama anda dahulu.');return}
+state.nama=n;state.inst=i;save();
+showReg();track('daftar',i);
+}
+function showReg(){
+if(!state.nama)return;
+document.getElementById('regcard').style.display='none';
+var d=document.getElementById('regdone');
+d.style.display='block';
+d.innerHTML='<b>Selamat datang, '+state.nama+'!</b>'+(state.inst?' ('+state.inst+')':'')+' Pendaftaran anda telah direkodkan. Klik <b>Mula laluan</b> di atas.';
+}
+/* ================= NAV ================= */
+function go(id){
+document.querySelectorAll('section').forEach(function(s){s.classList.remove('show')});
+document.getElementById(id).classList.add('show');
+document.querySelectorAll('nav.menu button').forEach(function(b){b.classList.toggle('active',b.dataset.sec===id)});
+document.getElementById('sidebar').classList.remove('openm');
+window.scrollTo({top:0,behavior:'smooth'});
+if(id==='report')fillReport();
+}
+document.querySelectorAll('nav.menu button').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.sec)})});
+function toggleMenu(){document.getElementById('sidebar').classList.toggle('openm')}
+/* ================= STEPS: SATU LANGKAH SATU HALAMAN ================= */
+function renderStepNav(){
+var host=document.getElementById('stepnav');
+host.innerHTML=STEPS.map(function(e,i){
+return '<button data-sec="step'+i+'" onclick="go(\'step'+i+'\')"><span class="ic" '+(state.done[i]?'style="background:var(--good)"':'')+'>'+(state.done[i]?'✓':(i+1))+'</span> '+e.t+'</button>';
+}).join('');
+}
+function stepPageHTML(e,i){
+var last=i===STEPS.length-1;
+return '<div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--gold)">Laluan pembelajaran · Langkah '+(i+1)+' daripada '+STEPS.length+'</div>'+
+'<h1 style="margin-top:.2em">'+(i+1)+'. '+e.t+'</h1>'+
+'<p style="color:var(--muted);margin-top:-.3em">'+e.ms+' · '+e.time+'</p>'+
+'<div class="card">'+
+'<h2>💡 Kenapa langkah ini penting</h2><p>'+e.why+'</p>'+
+'<div class="qbox"><b>Soalan panduan — jawab untuk topik ANDA:</b><ul>'+e.q.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div>'+
+'<div class="good"><b>Contoh:</b> '+e.example+'</div>'+
+'<div class="badx"><b>Elakkan:</b> '+e.avoid+'</div>'+
+'<button class="btn sm donebtn" style="'+(state.done[i]?'background:var(--good)':'')+'" onclick="toggleDone('+i+')">'+(state.done[i]?'✓ Selesai — klik untuk buat asal':'Tanda selesai')+'</button>'+
+'</div>'+
+(last&&state.done.every(Boolean)?'<div class="good" id="pathdone"><b>Hebat!</b> Semua 6 langkah selesai. Sekarang tukar jawapan anda kepada prompt sebenar.</div>':'')+
+'<p class="no-print" style="display:flex;justify-content:space-between;gap:10px;margin-top:20px">'+
+'<button class="btn ghost" onclick="go(\''+(i===0?'intro':'step'+(i-1))+'\')">← '+(i===0?'Pengenalan':'Langkah '+i)+'</button>'+
+(last?'<button class="btn gold" onclick="go(\'builder\')">Bina prompt anda →</button>'
+     :'<button class="btn" onclick="go(\'step'+(i+1)+'\')">Langkah '+(i+2)+' →</button>')+
+'</p>';
+}
+function renderStepPages(){
+var builder=document.getElementById('builder');
+STEPS.forEach(function(e,i){
+var sec=document.getElementById('step'+i);
+if(!sec){sec=document.createElement('section');sec.id='step'+i;builder.parentNode.insertBefore(sec,builder);}
+sec.innerHTML=stepPageHTML(e,i);
+});
+}
+function toggleDone(i){state.done[i]=!state.done[i];save();
+if(state.done[i])track('langkah_selesai','Langkah '+(i+1)+': '+STEPS[i].t+(state.done.every(Boolean)?' (SEMUA SELESAI)':''));
+renderStepNav();renderStepPages();
+document.getElementById('step'+i).classList.add('show');
+document.querySelectorAll('nav.menu button').forEach(function(b){b.classList.toggle('active',b.dataset.sec==='step'+i)});
+updateProg();}
+/* ================= QUIZ RENDER ================= */
+function renderQuiz(){
+var host=document.getElementById('quizbox');host.innerHTML='';
+QUIZ.forEach(function(e,i){
+var d=document.createElement('div');d.className='quiz-q';
+d.innerHTML='<h3>'+(i+1)+'. '+e.q+'</h3>'+e.o.map(function(o,j){
+return'<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"><span>'+o+'</span></label>'}).join('')+
+'<div class="fb" id="fb'+i+'"></div>';
+host.appendChild(d);
+});}
+function checkQuiz(){
+var sc=0;
+QUIZ.forEach(function(e,i){
+var sel=document.querySelector('input[name=q'+i+']:checked');
+var fb=document.getElementById('fb'+i);
+if(!sel){fb.className='fb no';fb.textContent='Belum dijawab.';return}
+if(+sel.value===e.a){sc++;fb.className='fb ok';fb.textContent='✓ '+e.fb}
+else{fb.className='fb no';fb.textContent='✗ Cuba fikirkan semula — jawapan betul: “'+e.o[e.a]+'”. '+e.fb}
+});
+var res=document.getElementById('quizres');res.style.display='block';
+document.getElementById('scoretxt').textContent='Skor: '+sc+' / '+QUIZ.length;
+document.getElementById('scoremsg').textContent=sc===5?'Cemerlang! Anda sedia membimbing rakan pendidik lain.':sc>=3?'Bagus! Semak semula bahagian yang tersilap dalam Laluan Pembelajaran.':'Tidak mengapa — kembali ke 6 Langkah dan cuba lagi.';
+if(sc>=3){state.quizDone=true;save();updateProg()}
+track('kuiz',sc+'/'+QUIZ.length);
+}
+/* ================= PROMPT BUILDER ================= */
+function v(id){return document.getElementById(id).value.trim()}
+function c(id){return document.getElementById(id).checked}
+function makePrompt(){
+var topik=v('f-topik')||'[TOPIK]';
+var pelajar=v('f-pelajar')||'[PROFIL PELAJAR]';
+var hasil=v('f-hasil')||'[HASIL PEMBELAJARAN]';
+var sukar=v('f-sukar');
+var ubah=v('f-ubah')||'[APA YANG PELAJAR BOLEH UBAH]';
+var papar=v('f-papar')||'[APA YANG DIPAPARKAN DAN BERUBAH]';
+var gaya=v('f-gaya')||'warna biru royal (#2554e6) dan emas (#f6a623), moden dan bersih';
+var bahasa=document.getElementById('f-bahasa').value;
+var fb=[];
+if(c('c-explain'))fb.push('Setiap kali pelajar mengubah sesuatu, paparkan penerangan ringkas tentang APA yang berlaku dan KENAPA (bukan sekadar nombor berubah).');
+if(c('c-quiz'))fb.push('Sediakan bahagian kuiz: 5 soalan objektif berkaitan simulasi, dengan maklum balas serta-merta yang menerangkan jawapan.');
+if(c('c-score'))fb.push('Paparkan skor kuiz dan mesej galakan pada akhir.');
+if(c('c-miskonsepsi')&&sukar)fb.push('Pelajar sering keliru: "'+sukar+'". Masukkan penerangan atau amaran khas dalam simulasi untuk menangani salah faham ini.');
+var skrin=[];
+if(c('c-intro'))skrin.push('Skrin pengenalan: tajuk, objektif pembelajaran, dan arahan penggunaan ringkas');
+skrin.push('Skrin simulasi utama (fokus app ini)');
+if(c('c-quiz'))skrin.push('Skrin kuiz semak kefahaman');
+if(c('c-rumusan'))skrin.push('Skrin rumusan: isi penting dan satu soalan refleksi');
+var p='Bina satu aplikasi web simulasi pembelajaran interaktif dalam SATU fail HTML (HTML + CSS + JavaScript dalam satu fail, tanpa pustaka luaran).\n\n'+
+'KONTEKS\n'+
+'- Topik: '+topik+'\n'+
+'- Pelajar sasaran: '+pelajar+'\n'+
+'- Hasil pembelajaran: selepas menggunakan app ini, pelajar dapat '+hasil+'\n\n'+
+'SIMULASI & INTERAKSI\n'+
+'- Pelajar boleh: '+ubah+'\n'+
+'- Paparan yang berubah serta-merta: '+papar+'\n'+
+'- Pastikan interaksi berfungsi sepenuhnya dengan nilai yang tepat dari segi fakta dan unit.\n\n'+
+'MAKLUM BALAS & PENILAIAN\n'+fb.map(function(x){return'- '+x}).join('\n')+'\n\n'+
+'STRUKTUR APP\n'+skrin.map(function(x,i){return'- '+(i+1)+'. '+x}).join('\n')+'\n\n'+
+'BAHASA & GAYA\n'+
+'- Bahasa: '+bahasa+'. Istilah teknikal boleh dikekalkan dalam Bahasa Inggeris jika lazim digunakan.\n'+
+'- Gaya visual: '+gaya+'.\n'+
+(c('c-mobile')?'- Mesra telefon (responsive) — pelajar akan menggunakannya pada telefon.\n':'')+
+'- Butang dan tulisan cukup besar, kontras warna yang baik.\n\n'+
+'KUALITI\n'+
+'- Semua kandungan mestilah tepat dari segi fakta. Jika tidak pasti tentang sesuatu nilai teknikal, gunakan nilai piawai industri.\n'+
+'- Pastikan app boleh terus digunakan tanpa penerangan tambahan daripada pensyarah.';
+document.getElementById('ptext').textContent=p;
+document.getElementById('promptout').style.display='block';
+document.getElementById('promptout').scrollIntoView({behavior:'smooth'});
+state.promptDone=true;state.saved={topik:topik,pelajar:pelajar,hasil:hasil,sukar:sukar,ubah:ubah,papar:papar,fb:fb,skrin:skrin,gaya:gaya,bahasa:bahasa,prompt:p};
+save();updateProg();
+track('prompt_dijana',topik);
+}
+function copiedMsg(){var b=document.getElementById('copybtn');b.textContent='✓ Disalin! Tampal di Gemini Canvas';setTimeout(function(){b.textContent='📋 Salin prompt'},2500)}
+function copyPrompt(){
+var t=document.getElementById('ptext').textContent;
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(copiedMsg,function(){copyFallback(t)})}
+else copyFallback(t);
+}
+function copyFallback(t){
+var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+try{document.execCommand('copy');copiedMsg()}catch(e){alert('Sila salin secara manual (tekan lama / Ctrl+C pada teks prompt).')}
+document.body.removeChild(ta);
+}
+function clearAll(){
+['f-topik','f-pelajar','f-hasil','f-sukar','f-ubah','f-papar','f-gaya'].forEach(function(id){document.getElementById(id).value=''});
+document.getElementById('promptout').style.display='none';
+}
+/* ================= REPORT ================= */
+function fillReport(){
+var s=state.saved;if(!s)return;
+document.getElementById('r-topik').textContent=s.topik;
+document.getElementById('r-pelajar').textContent=s.pelajar;
+document.getElementById('r-hasil').textContent=s.hasil;
+document.getElementById('r-sukar').textContent=s.sukar||'—';
+document.getElementById('r-ubah').textContent=s.ubah;
+document.getElementById('r-papar').textContent=s.papar;
+document.getElementById('r-fb').textContent=s.fb.join(' · ')||'—';
+document.getElementById('r-struktur').textContent=s.skrin.join(' → ')+' · '+s.bahasa+' · '+s.gaya;
+document.getElementById('r-prompt').textContent=s.prompt;
+}
+/* ================= PROGRESS ================= */
+function updateProg(){
+var total=8,got=state.done.filter(Boolean).length+(state.quizDone?1:0)+(state.promptDone?1:0);
+var pct=Math.round(got/total*100);
+document.getElementById('pct').textContent=pct+'%';
+document.getElementById('pbar').style.width=pct+'%';
+}
+renderStepNav();renderStepPages();renderQuiz();updateProg();showReg();
+if(state.saved){fillReport();document.getElementById('ptext').textContent=state.saved.prompt;document.getElementById('promptout').style.display='block'}
+</script>
+</body>
+</html>
