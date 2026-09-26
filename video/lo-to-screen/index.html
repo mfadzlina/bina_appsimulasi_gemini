@@ -182,8 +182,8 @@ const STEPS=[
  {k:'fv',n:9,title:'Video PdP Siap!',sub:'Sedia untuk digunakan dalam kelas',ph:3,dur:7,
   caps:['Akhirnya, kita memperoleh sebuah <strong>video PdP yang siap digunakan</strong>.']},
 ];
-const SC=[]; let T=0;
-function addScene(kind,dur,data){const s={kind,start:T,dur,data};SC.push(s);T+=dur;return s}
+const SC=[]; let T=0; const OV=window.TL||null; const CUE=OV?OV.cue:{think:2.6,quote:[.8,4,7.2],close:2.4};
+function addScene(kind,dur,data){if(OV)dur=OV.dur[SC.length]; const s={kind,start:T,dur,data};SC.push(s);T+=dur;return s}
 addScene('intro',10);
 STEPS.forEach(s=>addScene('step',s.dur,s));
 addScene('think',8);
@@ -200,9 +200,9 @@ function sceneEl(s,html){const el=$(`<div class="scene">${html}</div>`);root.app
 function captions(el,s,caps){
  const bar=$(`<div><div class="capbox"></div><div class="capbar"></div></div>`); el.appendChild(bar);
  tw(bar,s.start+.3,.6,{o:0,y:40},{o:1,y:0});
- const n=caps.length, span=(s.dur-1.0)/n;
+ const n=caps.length, lens=caps.map(c=>c.replace(/<[^>]+>/g,'').length), tot=lens.reduce((x,y)=>x+y,0); let acc=0;
  caps.forEach((c,i)=>{const ce=$(`<div class="cap"><span>${c}</span></div>`);el.appendChild(ce);
-  const a=s.start+.6+i*span, b=a+span-.25;
+  const span=(s.dur-1.2)*lens[i]/tot; const a=s.start+.6+acc; acc+=span; const b=a+span-.25;
   tw(ce,a,.5,{o:0,y:18},{o:1,y:0}); if(i<n-1) tw(ce,b,.35,{},{o:0,y:-14},'inout');});
 }
 
@@ -271,8 +271,8 @@ for(const s of SC){ const a=s.start;
    <div class="center" style="top:520px;font-size:120px;font-weight:800;color:var(--navy)" id="t2">Ia ialah satu <span style="font-family:Caveat;color:var(--yellow);font-size:150px">cara berfikir.</span></div>
    <div class="abs" id="brain" style="left:890px;top:770px;width:140px;height:140px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;box-shadow:0 16px 40px rgba(27,63,184,.35)">
    <svg viewBox="0 0 64 64" width="84" height="84" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M24 12c-6 0-10 5-9 10-5 2-6 9-2 12-2 5 2 11 8 11 1 5 7 7 11 3V14c-2-2-5-3-8-2z"/><path d="M40 12c6 0 10 5 9 10 5 2 6 9 2 12 2 5-2 11-8 11-1 5-7 7-11 3"/><path d="M22 24h6M20 34h8M36 26h6M36 36h8"/></svg></div>`);
-  tw(q(el,'#t1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#t2'),a+2.6,.9,{o:0,s:.6},{o:1,s:1},'back'); tw(q(el,'#brain'),a+3.6,.8,{o:0,s:0},{o:1,s:1},'back');
-  loop(q(el,'#brain'),(e,t)=>{if(t>a+4.4)e.style.transform=`scale(${1+.05*Math.sin((t-a)*3)})`});
+  tw(q(el,'#t1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#t2'),a+CUE.think,.9,{o:0,s:.6},{o:1,s:1},'back'); tw(q(el,'#brain'),a+CUE.think+1,.8,{o:0,s:0},{o:1,s:1},'back');
+  loop(q(el,'#brain'),(e,t)=>{if(t>a+CUE.think+1.8)e.style.transform=`scale(${1+.05*Math.sin((t-a)*3)})`});
  }
  if(s.kind==='quote'){
   const L=[['🎯','Bermula dengan <b>apa yang pelajar perlu belajar</b>,'],['👀','menentukan <b>bagaimana mereka perlu melihatnya</b>,'],['🤖','kemudian barulah memilih <b>bagaimana AI boleh membantu</b><br>kita menghasilkan pengalaman pembelajaran tersebut.']];
@@ -281,7 +281,7 @@ for(const s of SC){ const a=s.start;
    <div style="flex:none;width:110px;height:110px;border-radius:30px;background:#fff;box-shadow:0 12px 30px rgba(27,63,184,.14);display:flex;align-items:center;justify-content:center;font-size:56px">${x[0]}</div><div>${x[1]}</div></div>`).join('')}</div>`);
   el.querySelectorAll('b').forEach(b=>{b.style.color='var(--navy)';b.style.fontWeight=700});
   tw(q(el,'#qm'),a+.2,.7,{o:0,s:.3},{o:1,s:1},'back');
-  qa(el,'.ql').forEach((x,i)=>tw(x,a+.8+i*3.2,.8,{o:0,x:-80},{o:1,x:0},'out'));
+  qa(el,'.ql').forEach((x,i)=>tw(x,a+CUE.quote[i],.8,{o:0,x:-80},{o:1,x:0},'out'));
  }
  if(s.kind==='chain'){
   const el=sceneEl(s,`<div class="center" style="top:230px;font-size:44px;color:var(--grey);font-weight:500" id="c0">Daripada…</div>
@@ -290,15 +290,15 @@ for(const s of SC){ const a=s.start;
    <div class="abs" style="left:0;right:0;top:700px;display:flex;justify-content:center;gap:80px;font-size:32px;font-weight:600;color:var(--navy2)">
    <div class="ic">🧠 Pengajaran lebih bermakna</div><div class="ic">👥 Pembelajaran lebih aktif</div><div class="ic">📈 Impak lebih besar</div></div>`);
   tw(q(el,'#c0'),a+.2,.6,{o:0},{o:1});
-  const seq=qa(el,'.pp,.pa'); seq.forEach((x,i)=>tw(x,a+.6+i*.32,.55,{o:0,s:.3,y:40},{o:1,s:1,y:0},'back'));
-  qa(el,'.ic').forEach((x,i)=>tw(x,a+4+i*.45,.6,{o:0,y:30},{o:1,y:0},'back'));
-  const last=qa(el,'.pp')[4]; loop(last,(e,t)=>{if(t>a+4)e.style.transform=`scale(${1+.06*Math.sin((t-a)*4)})`});
+  const seq=qa(el,'.pp,.pa'); seq.forEach((x,i)=>tw(x,a+.6+i*.55,.55,{o:0,s:.3,y:40},{o:1,s:1,y:0},'back'));
+  qa(el,'.ic').forEach((x,i)=>tw(x,a+5.6+i*.45,.6,{o:0,y:30},{o:1,y:0},'back'));
+  const last=qa(el,'.pp')[4]; loop(last,(e,t)=>{if(t>a+5.6)e.style.transform=`scale(${1+.06*Math.sin((t-a)*4)})`});
  }
  if(s.kind==='close'){
   const el=sceneEl(s,`<div class="center" style="top:250px;font-size:54px;line-height:1.35;font-weight:600;color:var(--ink)" id="k1">Video mungkin <span style="color:var(--grey)">pendek</span>,<br>tetapi apabila perancangannya <span style="color:var(--navy)">tepat</span>,</div>
    <div class="center" style="top:470px;font-size:74px;line-height:1.2;font-weight:800;color:var(--navy)" id="k2">impaknya kepada pembelajaran<br>boleh menjadi <span style="background:linear-gradient(transparent 62%,var(--yellow) 62%)">jauh lebih besar.</span></div>
    <div class="center hand" style="top:760px;font-size:80px" id="k3">Same Educator, Bigger Impact ♡</div>`);
-  tw(q(el,'#k1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#k2'),a+2.4,.9,{o:0,s:.7},{o:1,s:1},'back'); tw(q(el,'#k3'),a+4.8,.8,{o:0,y:30,r:-4},{o:1,y:0,r:-2},'back');
+  tw(q(el,'#k1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#k2'),a+CUE.close,.9,{o:0,s:.7},{o:1,s:1},'back'); tw(q(el,'#k3'),a+CUE.close+3,.8,{o:0,y:30,r:-4},{o:1,y:0,r:-2},'back');
  }
  if(s.kind==='info'){
   const el=sceneEl(s,`<img id="ig" src="infographic.webp" style="position:absolute;left:0;top:60px;width:1920px">

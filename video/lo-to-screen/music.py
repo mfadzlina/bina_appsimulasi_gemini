@@ -1,5 +1,7 @@
 import numpy as np, wave
-SR=44100; TOTAL=143.0; N=int(SR*TOTAL); BPM=120; BEAT=60/BPM; BAR=4*BEAT
+import json
+TL=json.load(open('timeline.json'))
+SR=44100; TOTAL=TL['total']; N=int(SR*TOTAL); BPM=120; BEAT=60/BPM; BAR=4*BEAT
 rng=np.random.default_rng(7)
 L=np.zeros(N); R=np.zeros(N); REV=np.zeros(N)
 def mf(m): return 440*2**((m-69)/12)
@@ -73,18 +75,23 @@ def pop(f=900):
 CH=[(62,66,69,74),(61,64,69,73),(62,66,71,74),(62,67,71,74)]
 BS=[38,33,35,31]
 MEL=[(0,74,1),(1,76,1),(2,78,1.5),(3.5,81,.5),(4,76,2),(6.5,73,.5),(7,76,1),(8,78,1),(9,74,1),(10,78,1),(11,81,1),(12,79,1.5),(13.5,78,.5),(14,76,1),(15,74,1)]
-nbars=int(np.ceil(TOTAL/BAR))
+ST=TL['starts']; OFF=ST[1]%BAR
+def snap(t): return OFF+round((t-OFF)/BAR)*BAR
+B_MAIN=snap(ST[1]); B_BREAK=snap(ST[10]); B_FINAL=snap(ST[12]); B_OUT=snap(ST[14])
+nbars=int(np.ceil((TOTAL-OFF)/BAR))+1
+def btime(b): return OFF+b*BAR
 def section(b):
-    t=b*BAR
-    if b<5: return 'intro'
-    if b<49: return 'main'
-    if b<59: return 'break'
-    if b<67: return 'final'
+    t=btime(b)+1e-6
+    if t<B_MAIN: return 'intro'
+    if t<B_BREAK: return 'main'
+    if t<B_FINAL: return 'break'
+    if t<B_OUT: return 'final'
     return 'outro'
-melody_bars=set(list(range(21,29))+list(range(37,45))+list(range(59,67)))
+bi=lambda t: int(round((t-OFF)/BAR))
+mm=bi(B_MAIN); melody_bars=set(list(range(mm+16,mm+24))+list(range(mm+40,mm+48))+list(range(bi(B_FINAL),bi(B_OUT))))
 side=np.ones(N)
 for b in range(nbars):
-    t0=b*BAR; sec=section(b); c=CH[b%4]; root=BS[b%4]
+    t0=btime(b); sec=section(b); c=CH[b%4]; root=BS[b%4]
     if t0>=TOTAL: break
     # pad
     pg={'intro':.18,'main':.13,'break':.2,'final':.14,'outro':.18}[sec]
@@ -96,7 +103,7 @@ for b in range(nbars):
         ag={'intro':.16,'main':.14,'break':.12,'final':.12,'outro':.12}[sec]
         for i,pi in enumerate(pat):
             tt=t0+i*step
-            if sec=='outro' and b>=70: break
+            if sec=='outro' and t0>=TOTAL-6: break
             add(pluck(mf(c[pi]+12),.5),tt,ag*(1 if i%2==0 else .75),(-.35 if i%2 else .35),.35)
     # drums + bass
     if sec in('main','final'):
@@ -112,25 +119,25 @@ for b in range(nbars):
         for (o,dur) in [(0,.45),(1,.2),(1.5,.45),(2.5,.2),(3,.45),(3.5,.4)]:
             add(bass(mf(root),dur),t0+o*BEAT,.30,0,0)
         if b%8==7: add(hat(True),t0+3.5*BEAT,.18,.2,.2)
-    if sec=='intro' and b>=3:
+    if sec=='intro' and t0>=B_MAIN-2*BAR:
         for q in range(8): add(hat(),t0+q*BEAT/2,.12,.3,.05)
     if sec=='break':
         add(bass(mf(root),BAR*.9)*np.linspace(1,.3,int(BAR*.9*SR)),t0,.18,0,0)
-    if sec=='outro' and b<71:
+    if sec=='outro' and t0<TOTAL-4:
         add(bass(mf(root),BAR*.9)*np.linspace(1,.3,int(BAR*.9*SR)),t0,.15,0,0)
     # melody
     if b in melody_bars:
         mb=(b-min(x for x in melody_bars if x<=b and (x-min(melody_bars))%1==0))%4
         base=b-(b%4)
         if b%4==0:
-            for (o,m,d) in MEL: add(bell(mf(m),1.6),base*BAR+o*BEAT,.16,.15,.5)
+            for (o,m,d) in MEL: add(bell(mf(m),1.6),btime(b)+o*BEAT,.16,.15,.5)
 # risers & final hit
-add(riser(BAR*1.0),4*BAR,.35,0,.2); add(riser(BAR),58*BAR,.35,0,.2)
-for tb in (5*BAR,59*BAR): add(bell(mf(62),3),tb,.18,0,.6); add(kick(),tb,.3)
-add(pad([mf(m-12) for m in (62,66,69,74)],6,att=.3,rel=3),137.0,.2,0,.8)
-add(bell(mf(74),4),137.0,.18,0,.8); add(bell(mf(78),4),137.1,.12,.2,.8); add(bell(mf(81),4),137.2,.1,-.2,.8)
+add(riser(BAR*1.0),B_MAIN-BAR,.35,0,.2); add(riser(BAR),B_FINAL-BAR,.35,0,.2)
+for tb in (B_MAIN,B_FINAL): add(bell(mf(62),3),tb,.18,0,.6); add(kick(),tb,.3)
+add(pad([mf(m-12) for m in (62,66,69,74)],6,att=.3,rel=3),TOTAL-6,.2,0,.8)
+add(bell(mf(74),4),TOTAL-6,.18,0,.8); add(bell(mf(78),4),TOTAL-5.9,.12,.2,.8); add(bell(mf(81),4),TOTAL-5.8,.1,-.2,.8)
 # sfx
-starts=[0,10,20,31,41,51,61,72,81,91,98,106,118,126,134]
+starts=ST
 for s in starts[1:]: add(whoosh(.7),s-.45,.35,0,.2)
 for s in starts[1:10]: add(pop(900),s+.65,.18,0,.2); add(pop(1300),s+1.85,.08,0,.2)
 # apply sidechain to everything except drums? (approx: whole mix, gentle)
@@ -143,6 +150,19 @@ def conv(x,h):
 RL=conv(REV,ir[0]); RR=conv(REV,ir[1]); sc=.06
 L+=RL*sc; R+=RR*sc
 mix=np.stack([L,R],1)
+if TL.get('narr'):
+    import wave as W
+    V=np.zeros(N)
+    for i,s0 in enumerate(ST):
+        w=W.open(f'../narr/{i:02d}.wav'); x=np.frombuffer(w.readframes(w.getnframes()),'<i2')/32768; sr=w.getframerate()
+        x=np.interp(np.arange(int(len(x)*SR/sr))*sr/SR,np.arange(len(x)),x)
+        i0=int((s0+TL['V0'])*SR); x=x[:N-i0]; V[i0:i0+len(x)]+=x
+    V=V/np.max(np.abs(V))
+    e=np.convolve(np.abs(V),np.ones(int(.05*SR))/(.05*SR),'same'); act=(e>.01).astype(float)
+    k=int(.35*SR); act=np.convolve(act,np.ones(k)/k,'same').clip(0,1)
+    mix=mix/np.max(np.abs(mix))*0.8*(1-.62*act)[:,None]
+    Vr=V+0.08*conv(V,ir[0])
+    mix+=np.stack([Vr,Vr],1)*0.95
 # fades
 fi=int(.5*SR); fo=int(5*SR); mix[:fi]*=np.linspace(0,1,fi)[:,None]; mix[-fo:]*=np.linspace(1,0,fo)[:,None]**1.5
 mix=np.tanh(mix/np.max(np.abs(mix))*1.3)
