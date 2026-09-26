@@ -1,0 +1,337 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="fonts.css" rel="stylesheet">
+<style>
+:root{--navy:#1b3fb8;--navy2:#0f2a7a;--yellow:#f7c63c;--lav:#e9e3fb;--pink:#fbe3ee;--ink:#1d2445;--grey:#5a6384}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#fff}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:Poppins,sans-serif;color:var(--ink);
+ background:radial-gradient(1200px 700px at 15% 10%,#f3efff 0%,transparent 60%),radial-gradient(1000px 700px at 90% 90%,#fdf1f6 0%,transparent 60%),linear-gradient(180deg,#ffffff,#f7f8ff)}
+.abs{position:absolute}
+.blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.55}
+.scene{position:absolute;inset:0;display:none}
+svg [class]{transform-box:fill-box;transform-origin:center}
+.card{position:absolute;left:150px;top:190px;width:600px;height:600px;border-radius:48px;background:#fff;
+ box-shadow:0 30px 80px rgba(27,63,184,.16),0 4px 14px rgba(27,63,184,.08);display:flex;align-items:center;justify-content:center}
+.card::before{content:"";position:absolute;inset:18px;border-radius:36px;background:linear-gradient(160deg,#f4f1ff,#fff 60%,#fff8e3)}
+.card svg{position:relative;width:470px;height:470px;overflow:visible}
+.badge{position:absolute;left:112px;top:150px;width:120px;height:120px;border-radius:50%;background:var(--navy);color:#fff;
+ font-weight:800;font-size:64px;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(27,63,184,.35);border:6px solid #fff}
+.right{position:absolute;left:860px;top:210px;width:950px}
+.chip{display:inline-block;padding:10px 26px;border-radius:40px;background:var(--navy);color:#fff;font-weight:700;letter-spacing:6px;font-size:24px}
+.step{font-weight:600;color:var(--grey);font-size:30px;margin-top:22px}
+.title{font-weight:800;color:var(--navy);font-size:92px;line-height:1.02;margin-top:8px}
+.sub{font-size:38px;color:var(--grey);margin-top:22px;font-weight:500}
+.underline{height:12px;width:260px;border-radius:8px;background:var(--yellow);margin-top:18px;transform-origin:left center}
+.tags{margin-top:40px;display:flex;flex-wrap:wrap;gap:18px}
+.tag{padding:16px 28px;border-radius:22px;background:#fff;border:3px solid #dfe4fb;font-size:30px;font-weight:600;color:var(--navy2);box-shadow:0 8px 20px rgba(27,63,184,.08)}
+.tag b{color:var(--yellow);-webkit-text-stroke:0;margin-right:10px}
+.capbox{position:absolute;left:140px;right:140px;top:842px;height:122px;border-radius:30px;background:rgba(255,255,255,.92);
+ box-shadow:0 14px 40px rgba(27,63,184,.12);border:2px solid #e6e9fb}
+.cap{position:absolute;left:190px;right:190px;top:842px;height:122px;display:flex;align-items:center;justify-content:center;text-align:center;
+ font-size:33px;line-height:1.3;font-weight:500;color:var(--ink)}
+.cap strong{color:var(--navy);font-weight:700}
+.capbar{position:absolute;left:140px;top:842px;width:14px;height:122px;border-radius:30px 0 0 30px;background:var(--yellow)}
+/* header */
+#logo{position:absolute;left:60px;top:42px;font-weight:800;font-size:40px;color:var(--navy)}
+#logo i{font-family:Caveat,cursive;color:var(--yellow);font-style:normal;font-size:50px;margin:0 6px}
+#phases{position:absolute;right:60px;top:52px;display:flex;gap:14px;align-items:center;font-weight:700;font-size:22px;letter-spacing:4px;color:#9aa3c7}
+#phases .ar{color:var(--yellow)}
+#phases span.on{color:var(--navy)}
+/* timeline */
+#tl{position:absolute;left:0;top:990px;width:1920px;height:80px}
+#tl svg{position:absolute;inset:0}
+.dot{position:absolute;top:22px;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:#fff;border:6px solid var(--yellow)}
+.dot.done{background:var(--navy);border-color:var(--navy)}
+.dot.cur{background:var(--yellow);border-color:#fff;box-shadow:0 0 0 6px var(--yellow),0 6px 20px rgba(247,198,60,.7)}
+/* intro */
+.big{font-weight:800;font-size:200px;color:var(--navy);letter-spacing:-4px;line-height:1}
+.to{font-family:Caveat,cursive;color:var(--yellow);font-size:230px;font-weight:700}
+.chain{display:flex;gap:26px;align-items:center;font-weight:600;letter-spacing:10px;font-size:34px;color:var(--navy2)}
+.chain .ar{color:var(--yellow);font-size:40px;letter-spacing:0}
+.bubble{position:absolute;padding:30px 40px;border-radius:40px;background:var(--pink);font-family:Caveat,cursive;font-size:56px;line-height:1.05;color:var(--navy2);text-align:center}
+.hand{font-family:Caveat,cursive;color:var(--navy2)}
+.center{position:absolute;left:0;right:0;text-align:center}
+.pill{display:inline-block;padding:22px 48px;border-radius:60px;font-weight:800;font-size:54px;letter-spacing:8px;color:#fff;background:var(--navy);box-shadow:0 16px 40px rgba(27,63,184,.3)}
+</style></head>
+<body><div id="stage">
+ <div class="blob" id="b1" style="left:-150px;top:-120px;width:620px;height:620px;background:#dcd3ff"></div>
+ <div class="blob" id="b2" style="right:-180px;top:260px;width:560px;height:560px;background:#ffe9a8"></div>
+ <div class="blob" id="b3" style="left:620px;bottom:-260px;width:700px;height:520px;background:#ffd6e8"></div>
+ <div id="scenes"></div>
+ <div id="hud">
+  <div id="logo">LO<i>to</i>Screen</div>
+  <div id="phases"></div>
+  <div id="tl"></div>
+ </div>
+</div>
+<script>
+// ---------------- tween engine ----------------
+const E={lin:p=>p,out:p=>1-Math.pow(1-p,3),inout:p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2,
+ back:p=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)},
+ el:p=>p===0||p===1?p:Math.pow(2,-10*p)*Math.sin((p*10-.75)*(2*Math.PI/3))+1};
+const TW=new Map(), LOOPS=[], SHOWS=[];
+const DEF={o:1,x:0,y:0,s:1,r:0,sx:1,sy:1};
+function tw(el,t0,d,from,to,ease='out'){ if(!el)return; if(!TW.has(el))TW.set(el,[]);
+ TW.get(el).push({t0,d,from,to,ease:E[ease]||E.out}); }
+function loop(el,fn){LOOPS.push({el,fn})}
+function show(el,a,b){SHOWS.push({el,a,b})}
+function seek(t){
+ for(const s of SHOWS){ s.el.style.display=(t>=s.a&&t<s.b)?'block':'none'; }
+ for(const [el,list] of TW){
+  const st={...DEF}; const seen={};
+  const sorted=list.slice().sort((a,b)=>a.t0-b.t0);
+  for(const k of Object.keys(DEF)){
+   const ts=sorted.filter(w=>k in w.to); if(!ts.length)continue;
+   if(t<ts[0].t0){ st[k]=(k in ts[0].from)?ts[0].from[k]:DEF[k]; continue; }
+   let w=ts[0]; for(const x of ts) if(x.t0<=t) w=x;
+   const p=w.d<=0?1:Math.min(1,Math.max(0,(t-w.t0)/w.d)); const f=(k in w.from)?w.from[k]:st[k];
+   st[k]=f+(w.to[k]-f)*w.ease(p);
+  }
+  el.style.opacity=st.o;
+  el.style.transform=`translate(${st.x}px,${st.y}px) rotate(${st.r}deg) scale(${st.s*st.sx},${st.s*st.sy})`;
+ }
+ for(const l of LOOPS) l.fn(l.el,t);
+}
+window.seek=seek;
+const $=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+const q=(root,sel)=>root.querySelector(sel), qa=(root,sel)=>[...root.querySelectorAll(sel)];
+
+// ---------------- icons ----------------
+const ICON={
+lo:`<svg viewBox="0 0 200 200"><g class="doc"><rect x="45" y="22" width="110" height="150" rx="14" fill="#fff" stroke="#f7c63c" stroke-width="7"/>
+ <text x="100" y="92" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="46" fill="#1b3fb8">LO</text>
+ <rect class="ln" x="66" y="110" width="68" height="7" rx="3.5" fill="#1b3fb8"/><rect class="ln" x="66" y="126" width="68" height="7" rx="3.5" fill="#1b3fb8"/>
+ <rect class="ln" x="66" y="142" width="48" height="7" rx="3.5" fill="#1b3fb8"/></g>
+ <g class="pen"><rect x="150" y="90" width="14" height="70" rx="4" fill="#f7c63c" transform="rotate(30 157 125)"/><polygon points="0,0 14,0 7,16" fill="#1d2445" transform="translate(132 150) rotate(30)"/></g>
+ <g class="chk"><circle cx="160" cy="46" r="22" fill="#1b3fb8"/><path d="M149 46 l8 8 l14 -16" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`,
+ve:`<svg viewBox="0 0 200 200"><g class="rays" stroke="#f7c63c" stroke-width="6" stroke-linecap="round"><line x1="100" y1="6" x2="100" y2="18"/><line x1="58" y1="20" x2="66" y2="30"/><line x1="142" y1="20" x2="134" y2="30"/><line x1="40" y1="56" x2="52" y2="60"/><line x1="160" y1="56" x2="148" y2="60"/></g>
+ <g class="bulb"><circle cx="100" cy="62" r="30" fill="#fde58a" stroke="#f7c63c" stroke-width="5"/><rect x="88" y="88" width="24" height="16" rx="4" fill="#9aa3c7"/></g>
+ <g class="cam"><rect x="36" y="104" width="128" height="80" rx="16" fill="#1d2445"/><rect x="60" y="94" width="36" height="18" rx="6" fill="#1d2445"/>
+ <circle cx="100" cy="144" r="30" fill="#2c3563" stroke="#5a6384" stroke-width="5"/><circle cx="100" cy="144" r="17" fill="#1b3fb8"/><circle cx="93" cy="137" r="6" fill="#9fb4ff"/>
+ <rect x="138" y="114" width="14" height="8" rx="3" fill="#f7c63c"/></g><rect class="flash" x="0" y="0" width="200" height="200" rx="30" fill="#fff"/></svg>`,
+st:`<svg viewBox="0 0 200 200"><g class="tg"><circle cx="95" cy="110" r="78" fill="#1b3fb8"/><circle cx="95" cy="110" r="60" fill="#fff"/><circle cx="95" cy="110" r="42" fill="#1b3fb8"/><circle cx="95" cy="110" r="25" fill="#f7c63c"/><circle cx="95" cy="110" r="9" fill="#1b3fb8"/></g>
+ <g class="arrow"><line x1="98" y1="107" x2="178" y2="27" stroke="#1d2445" stroke-width="8" stroke-linecap="round"/><polygon points="178,27 186,4 164,12" fill="#1d2445"/><polygon points="170,22 190,26 184,10" fill="#1d2445" transform="translate(-4 8)"/></g></svg>`,
+sm:`<svg viewBox="0 0 200 200"><rect x="12" y="30" width="176" height="130" rx="12" fill="#fde9b8" stroke="#e8b54a" stroke-width="5"/><rect x="22" y="40" width="156" height="110" rx="6" fill="#fff"/>
+ ${[0,1,2,3,4,5].map(i=>{const x=30+(i%3)*50,y=48+Math.floor(i/3)*50;return `<g class="tile"><rect x="${x}" y="${y}" width="44" height="42" rx="5" fill="#8fb7ff"/><polygon points="${x+4},${y+38} ${x+18},${y+20} ${x+28},${y+30} ${x+34},${y+24} ${x+42},${y+38}" fill="#fff" opacity=".9"/><circle cx="${x+34}" cy="${y+12}" r="5" fill="#fff"/></g>`}).join('')}
+ <g class="pencil"><rect x="168" y="110" width="12" height="60" rx="3" fill="#f7c63c" transform="rotate(20 174 140)"/><polygon points="0,0 12,0 6,14" fill="#1d2445" transform="translate(160 166) rotate(20)"/></g></svg>`,
+ai:`<svg viewBox="0 0 200 200"><g class="b1"><rect x="8" y="30" width="62" height="40" rx="14" fill="#f7a8e0"/><rect x="20" y="44" width="36" height="5" rx="2.5" fill="#fff"/><rect x="20" y="54" width="24" height="5" rx="2.5" fill="#fff"/></g>
+ <g class="b2"><rect x="132" y="22" width="62" height="40" rx="14" fill="#4f7cff"/><rect x="144" y="36" width="36" height="5" rx="2.5" fill="#fff"/><rect x="144" y="46" width="24" height="5" rx="2.5" fill="#fff"/></g>
+ <g class="b3"><rect x="136" y="130" width="58" height="36" rx="14" fill="#a98bff"/><rect x="148" y="143" width="32" height="5" rx="2.5" fill="#fff"/></g>
+ <g class="bot"><line x1="100" y1="44" x2="100" y2="60" stroke="#9aa3c7" stroke-width="5"/><circle class="ant" cx="100" cy="40" r="7" fill="#4f7cff"/>
+ <rect x="54" y="60" width="92" height="70" rx="30" fill="#fff" stroke="#dfe4fb" stroke-width="4"/><rect x="66" y="72" width="68" height="44" rx="20" fill="#16193a"/>
+ <g class="eyes"><path d="M80 96 q7 -10 14 0" stroke="#5fd0ff" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M106 96 q7 -10 14 0" stroke="#5fd0ff" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+ <path d="M92 106 q8 6 16 0" stroke="#5fd0ff" stroke-width="4" fill="none" stroke-linecap="round"/>
+ <rect x="70" y="132" width="60" height="44" rx="20" fill="#fff" stroke="#dfe4fb" stroke-width="4"/><circle cx="100" cy="152" r="8" fill="#4f7cff"/>
+ <circle cx="48" cy="96" r="10" fill="#dfe4fb"/><circle cx="152" cy="96" r="10" fill="#dfe4fb"/></g></svg>`,
+co:`<svg viewBox="0 0 200 200"><g class="f1"><rect x="10" y="30" width="100" height="84" rx="10" fill="#fff" stroke="#f7c63c" stroke-width="6"/><rect x="20" y="40" width="80" height="64" rx="4" fill="#8fb7ff"/><polygon points="24,100 50,68 66,86 76,76 96,100" fill="#fff"/><circle cx="80" cy="56" r="7" fill="#fff"/></g>
+ <g class="f2"><rect x="96" y="80" width="96" height="80" rx="10" fill="#fff" stroke="#f7c63c" stroke-width="6"/><rect x="105" y="89" width="78" height="62" rx="4" fill="#8fb7ff"/><polygon points="109,147 134,117 150,133 160,124 180,147" fill="#fff"/><circle cx="164" cy="104" r="7" fill="#fff"/></g>
+ <g class="link" fill="none" stroke="#1d2445" stroke-width="9" stroke-linecap="round"><rect x="58" y="138" width="44" height="24" rx="12" transform="rotate(-40 80 150)"/><rect x="84" y="158" width="44" height="24" rx="12" transform="rotate(-40 106 170)"/></g>
+ <g class="arr"><path d="M104 60 h24" stroke="#1b3fb8" stroke-width="7" stroke-linecap="round"/><polygon points="126,50 142,60 126,70" fill="#1b3fb8"/></g></svg>`,
+fl:`<svg viewBox="0 0 200 200"><defs><linearGradient id="fg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#1c2446"/><stop offset="1" stop-color="#2c3a8a"/></linearGradient>
+ <linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#9fb4ff"/></linearGradient></defs>
+ <g class="box"><rect x="10" y="50" width="180" height="100" rx="22" fill="url(#fg)"/>
+ <polygon class="play" points="36,74 36,126 80,100" fill="url(#pg)"/>
+ <text x="136" y="113" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="38" fill="#fff">Flow</text></g>
+ <g class="spark" fill="#f7c63c"><path d="M170 30 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4z"/><path d="M26 160 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/></g></svg>`,
+ed:`<svg viewBox="0 0 200 200"><rect x="30" y="18" width="140" height="120" rx="26" fill="#fff" stroke="#dfe4fb" stroke-width="4"/>
+ <g class="sc" stroke="#16193a" stroke-width="12" stroke-linecap="round" fill="none"><path d="M62 50 L138 102"/><path d="M62 102 L138 50"/></g>
+ <circle cx="62" cy="50" r="10" fill="#fff" stroke="#16193a" stroke-width="6"/><circle cx="62" cy="102" r="10" fill="#fff" stroke="#16193a" stroke-width="6"/>
+ <rect x="22" y="146" width="156" height="42" rx="14" fill="#6f8dff"/>
+ ${Array.from({length:22},(_,i)=>`<rect class="wv" x="${32+i*6.6}" y="152" width="3.4" height="30" rx="1.7" fill="#fff"/>`).join('')}</svg>`,
+fv:`<svg viewBox="0 0 200 200"><rect x="10" y="26" width="180" height="120" rx="10" fill="#2a2f45"/><rect x="18" y="34" width="164" height="104" rx="4" fill="#dfe8ff"/>
+ <rect x="18" y="34" width="164" height="104" rx="4" fill="url(#sky)"/><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3ff"/><stop offset="1" stop-color="#c9d7ff"/></linearGradient></defs>
+ <rect x="94" y="146" width="12" height="24" fill="#2a2f45"/><rect x="62" y="168" width="76" height="10" rx="5" fill="#2a2f45"/>
+ <g class="pb"><circle cx="100" cy="86" r="28" fill="#4f7cff"/><polygon points="92,72 92,100 114,86" fill="#fff"/></g>
+ <rect x="30" y="126" width="140" height="5" rx="2.5" fill="#fff" opacity=".8"/><rect class="prog" x="30" y="126" width="140" height="5" rx="2.5" fill="#1b3fb8" style="transform-origin:left center"/>
+ <g class="stars" fill="#f7c63c"><path d="M22 14 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/><path d="M180 12 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/></g></svg>`
+};
+
+// ---------------- data ----------------
+const PH=['IDEA','PLAN','CREATE','TEACH','IMPACT'];
+const STEPS=[
+ {k:'lo',n:1,title:'Learning Outcome',sub:'Tentukan Learning Outcome',ph:0,dur:10,
+  tags:['Tahu','Faham','Boleh lakukan'],
+  caps:['Perjalanan ini bermula dengan <strong>Learning Outcome (LO)</strong>.',
+        'Selepas menonton video ini, apakah yang pelajar sepatutnya <strong>tahu, faham</strong> atau <strong>boleh lakukan</strong>?']},
+ {k:'ve',n:2,title:'Visual Evidence',sub:'Pilih bukti visual yang kuat',ph:0,dur:11,
+  tags:['Jelas','Bantu pelajar melihat','Sokong pembelajaran'],
+  caps:['Pilih <strong>Visual Evidence</strong>: visual paling jelas yang membantu pelajar melihat dan memahami konsep.',
+        'Bukan sekadar mencantikkan video, tetapi visual yang <strong>benar-benar menyokong pembelajaran</strong>.']},
+ {k:'st',n:3,title:'Strategi',sub:'Pilih strategi PdP yang sesuai',ph:1,dur:10,
+  tags:['Terangkan konsep','Bandingkan','Tunjuk proses','Selesaikan masalah'],
+  caps:['Seterusnya, tentukan <strong>strategi pengajaran</strong> yang sesuai.',
+        'Terangkan konsep? Bandingkan dua keadaan? Tunjukkan proses? Atau selesaikan satu masalah?']},
+ {k:'sm',n:4,title:'Scene Map',sub:'Rancang scene · 8 saat setiap scene',ph:1,dur:10,timer:true,
+  caps:['Bina <strong>Scene Map</strong>: pecahkan kandungan kepada scene pendek, <strong>satu fokus</strong> setiap scene.',
+        'Untuk video Google Flow, satu scene biasanya dirancang sekitar <strong>lapan saat</strong>.']},
+ {k:'ai',n:5,title:'AI Checkpoints',sub:'Bincang & perhalusi dengan AI',ph:1,dur:10,checks:['Bincang','Semak','Perhalusi'],
+  caps:['AI bukan sekadar untuk menghasilkan video.',
+        'Guna <strong>AI Checkpoints</strong> untuk berbincang, menyemak dan memperhalusi keputusan pengajaran.']},
+ {k:'co',n:6,title:'Continuity',sub:'Pastikan kesinambungan antara scene',ph:2,dur:11,
+  tags:['Watak','Persekitaran','Arah visual','Gaya persembahan'],
+  caps:['Pastikan <strong>continuity</strong>: watak, persekitaran, arah visual dan gaya persembahan yang konsisten.',
+        'Supaya video terasa seperti <strong>satu perjalanan pembelajaran</strong>, bukan klip yang terpisah.']},
+ {k:'fl',n:7,title:'Google Flow',sub:'Jana klip, satu scene pada satu masa',ph:2,dur:9,clips:true,
+  caps:['Barulah kita masuk ke peringkat <strong>Google Flow</strong>,',
+        'di mana setiap scene dijana <strong>satu demi satu</strong> berdasarkan perancangan.']},
+ {k:'ed',n:8,title:'Edit',sub:'Tambah VO, overlay & susun dalam CapCut',ph:2,dur:10,
+  tags:['Voice over','Caption','Overlay','Animasi'],
+  caps:['Klip yang siap dibawa ke proses <strong>editing</strong>, contohnya menggunakan <strong>CapCut</strong>.',
+        'Tambah voice over, caption, overlay dan animasi untuk menarik perhatian kepada perkara penting.']},
+ {k:'fv',n:9,title:'Video PdP Siap!',sub:'Sedia untuk digunakan dalam kelas',ph:3,dur:7,
+  caps:['Akhirnya, kita memperoleh sebuah <strong>video PdP yang siap digunakan</strong>.']},
+];
+const SC=[]; let T=0;
+function addScene(kind,dur,data){const s={kind,start:T,dur,data};SC.push(s);T+=dur;return s}
+addScene('intro',10);
+STEPS.forEach(s=>addScene('step',s.dur,s));
+addScene('think',8);
+addScene('quote',12);
+addScene('chain',8);
+addScene('close',8);
+addScene('info',9);
+window.TOTAL=T; window.SCENES=SC.map(s=>({kind:s.kind,start:s.start,dur:s.dur}));
+
+// ---------------- builders ----------------
+const root=document.getElementById('scenes');
+function sceneEl(s,html){const el=$(`<div class="scene">${html}</div>`);root.appendChild(el);show(el,s.start,s.start+s.dur);
+ tw(el,s.start,.5,{o:0},{o:1},'lin'); tw(el,s.start+s.dur-.45,.45,{},{o:0},'lin'); return el}
+function captions(el,s,caps){
+ const bar=$(`<div><div class="capbox"></div><div class="capbar"></div></div>`); el.appendChild(bar);
+ tw(bar,s.start+.3,.6,{o:0,y:40},{o:1,y:0});
+ const n=caps.length, span=(s.dur-1.0)/n;
+ caps.forEach((c,i)=>{const ce=$(`<div class="cap"><span>${c}</span></div>`);el.appendChild(ce);
+  const a=s.start+.6+i*span, b=a+span-.25;
+  tw(ce,a,.5,{o:0,y:18},{o:1,y:0}); if(i<n-1) tw(ce,b,.35,{},{o:0,y:-14},'inout');});
+}
+
+for(const s of SC){ const a=s.start;
+ if(s.kind==='intro'){
+  const el=sceneEl(s,`
+   <div class="bubble" style="left:170px;top:150px;transform:rotate(-6deg)">Mula dengan pengajaran,<br>bukan dengan prompt.</div>
+   <div class="center" style="top:300px"><span class="big L1">LO</span> <span class="to" style="margin:0 24px 0 18px">to</span> <span class="big L2">Screen</span></div>
+   <div class="abs uline" style="left:760px;top:560px;width:560px;height:14px;border-radius:10px;background:var(--yellow)"></div>
+   <div class="center" style="top:620px"><div class="chain" style="justify-content:center">${PH.map((p,i)=>`<span class="ph">${p}</span>${i<4?'<span class="ar">➜</span>':''}`).join('')}</div></div>
+   <div class="hand abs" style="right:150px;top:150px;font-size:68px;transform:rotate(-10deg)" id="vk">Video kecil,<br>impak besar.</div>`);
+  const [L1,to,L2]=[q(el,'.L1'),q(el,'.to'),q(el,'.L2')];
+  [L1,to,L2].forEach(x=>x.style.display='inline-block');
+  tw(L1,a+.3,.9,{o:0,y:-160},{o:1,y:0},'back'); tw(to,a+.8,.8,{o:0,s:.2,r:-30},{o:1,s:1,r:0},'back'); tw(L2,a+1.1,.9,{o:0,y:160},{o:1,y:0},'back');
+  tw(q(el,'.uline'),a+1.8,.8,{o:0,sx:0},{o:1,sx:1});
+  qa(el,'.chain>span').forEach((x,i)=>{x.style.display='inline-block';tw(x,a+2.3+i*.18,.5,{o:0,y:30},{o:1,y:0},'back')});
+  tw(q(el,'.bubble'),a+3.6,.8,{o:0,s:.3},{o:1,s:1},'back');
+  tw(q(el,'#vk'),a+4.2,.8,{o:0,x:60},{o:1,x:0},'back');
+  loop(q(el,'.bubble'),(e,t)=>{if(t>a+4.4)e.style.transform=`rotate(-6deg) translateY(${Math.sin((t-a)*2)*8}px)`});
+  captions(el,s,['<strong>LO to Screen</strong>: proses membina video pengajaran secara lebih terancang,',
+                 'bermula dengan <strong>objektif pembelajaran</strong>, bukannya terus menghasilkan prompt AI.']);
+ }
+ if(s.kind==='step'){ const d=s.data;
+  const extra = d.tags?`<div class="tags">${d.tags.map(x=>`<div class="tag"><b>✓</b>${x}</div>`).join('')}</div>`
+   : d.timer?`<div class="tags" style="align-items:center;gap:26px">${[1,2,3,4].map(i=>`<div class="tag sc" style="padding:18px 22px">Scene ${i}<br><span style="color:#9aa3c7;font-size:24px">⏱ 8 saat</span></div>`).join('')}</div>`
+   : d.checks?`<div class="tags">${d.checks.map((x,i)=>`<div class="tag"><span style="display:inline-flex;width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;margin-right:12px;font-size:22px">${i+1}</span>${x}</div>`).join('')}</div>`
+   : d.clips?`<div class="tags">${[1,2,3,4,5].map(i=>`<div class="tag" style="width:150px;height:96px;padding:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1c2446,#34449a);color:#fff;border:none">▶ S${i}</div>`).join('')}</div>`
+   : `<div class="tags"><div class="tag" style="font-size:44px;padding:22px 40px;background:var(--navy);color:#fff;border:none">▶ Siap untuk PdP!</div></div>`;
+  const el=sceneEl(s,`<div class="card">${ICON[d.k]}</div><div class="badge">${d.n}</div>
+   <div class="right"><span class="chip">${PH[d.ph]}</span><div class="step">Langkah ${d.n} / 9</div><div class="title">${d.title}</div>
+   <div class="underline"></div><div class="sub">${d.sub}</div>${extra}</div>`);
+  tw(q(el,'.card'),a+.1,.9,{o:0,x:-140,s:.85},{o:1,x:0,s:1},'back');
+  tw(q(el,'.badge'),a+.6,.7,{o:0,s:0,r:-180},{o:1,s:1,r:0},'back');
+  const R=q(el,'.right'); [...R.children].forEach((c,i)=>tw(c,a+.5+i*.15,.7,{o:0,x:80},{o:1,x:0},'out'));
+  tw(q(el,'.underline'),a+1.1,.7,{sx:0},{sx:1});
+  qa(el,'.tags>.tag').forEach((c,i)=>tw(c,a+1.8+i*.35,.55,{o:0,s:.5,y:30},{o:1,s:1,y:0},'back'));
+  // subtle float of card
+  const card=q(el,'.card svg'); loop(card,(e,t)=>{e.style.transform=`translateY(${Math.sin((t-a)*1.6)*8}px)`});
+  const I=(sel)=>qa(el,sel);
+  if(d.k==='lo'){ I('.ln').forEach((x,i)=>tw(x,a+1.2+i*.3,.5,{sx:0},{sx:1})); tw(I('.pen')[0],a+1,.8,{o:0,x:40,y:-40},{o:1,x:0,y:0},'back'); tw(I('.chk')[0],a+2.4,.6,{s:0},{s:1},'back');}
+  if(d.k==='ve'){ tw(I('.cam')[0],a+.8,.7,{y:60,o:0},{y:0,o:1},'back'); tw(I('.bulb')[0],a+1.3,.7,{s:0},{s:1},'back'); tw(I('.rays')[0],a+1.8,.5,{o:0,s:.6},{o:1,s:1});
+    const f=I('.flash')[0]; tw(f,a+2.6,.05,{o:0},{o:.9},'lin'); tw(f,a+2.65,.5,{},{o:0},'lin');
+    loop(I('.rays')[0],(e,t)=>{if(t>a+2.3)e.style.opacity=.6+.4*Math.sin((t-a)*6)});}
+  if(d.k==='st'){ tw(I('.tg')[0],a+.8,.7,{s:0},{s:1},'back'); tw(I('.arrow')[0],a+1.6,.45,{o:0,x:160,y:-160},{o:1,x:0,y:0},'out');
+    loop(I('.tg')[0],(e,t)=>{const p=t-(a+2.05); if(p>0&&p<.5){e.style.transform=`scale(${1+.06*Math.sin(p*Math.PI*2)*(1-p*2)})`}});}
+  if(d.k==='sm'){ I('.tile').forEach((x,i)=>tw(x,a+1+i*.25,.45,{s:0,o:0},{s:1,o:1},'back')); tw(I('.pencil')[0],a+.8,.6,{o:0,y:-40},{o:1,y:0});
+    loop(I('.pencil')[0],(e,t)=>{if(t>a+1.4&&t<a+3)e.style.transform=`translate(${Math.sin((t-a)*14)*6}px,${Math.cos((t-a)*9)*4}px)`});
+    // timer tags: progress
+  }
+  if(d.k==='ai'){ tw(I('.bot')[0],a+.8,.8,{y:80,o:0},{y:0,o:1},'back'); ['.b1','.b2','.b3'].forEach((c,i)=>tw(I(c)[0],a+1.6+i*.5,.5,{s:0},{s:1},'back'));
+    loop(I('.bot')[0],(e,t)=>{if(t>a+1.6)e.style.transform=`translateY(${Math.sin((t-a)*3)*5}px) rotate(${Math.sin((t-a)*1.5)*3}deg)`});
+    loop(I('.eyes')[0],(e,t)=>{const k=(t-a)%2.4; e.style.transform=`scaleY(${k<.12?.1:1})`});}
+  if(d.k==='co'){ tw(I('.f1')[0],a+.8,.6,{x:-60,o:0},{x:0,o:1},'back'); tw(I('.f2')[0],a+1.2,.6,{x:60,o:0},{x:0,o:1},'back'); tw(I('.arr')[0],a+1.7,.5,{sx:0,o:0},{sx:1,o:1});
+    tw(I('.link')[0],a+2.1,.7,{s:0,r:-90},{s:1,r:0},'back');}
+  if(d.k==='fl'){ tw(I('.box')[0],a+.8,.7,{s:.3,o:0},{s:1,o:1},'back'); tw(I('.play')[0],a+1.4,.6,{x:-30,o:0},{x:0,o:1},'back');
+    loop(I('.spark')[0],(e,t)=>{e.style.opacity=.5+.5*Math.sin((t-a)*5); e.style.transform=`scale(${.9+.15*Math.sin((t-a)*5)})`});}
+  if(d.k==='ed'){ tw(I('.sc')[0],a+.8,.7,{s:0,r:-120},{s:1,r:0},'back');
+    loop(el,(e,t)=>{if(t<a||t>a+s.dur)return; I('.wv').forEach((w,i)=>{const h=.3+.7*Math.abs(Math.sin((t-a)*5+i*.7)*Math.cos((t-a)*2.3+i*.35)); w.style.transform=`scaleY(${h})`})});}
+  if(d.k==='fv'){ tw(I('.pb')[0],a+.8,.7,{s:0},{s:1},'el'); tw(I('.prog')[0],a+1.4,s.dur-2,{sx:0},{sx:1},'lin');
+    loop(I('.stars')[0],(e,t)=>{e.style.opacity=.5+.5*Math.sin((t-a)*6)});
+    loop(I('.pb')[0],(e,t)=>{if(t>a+1.6)e.style.transform=`scale(${1+.05*Math.sin((t-a)*4)})`});}
+  captions(el,s,d.caps);
+ }
+ if(s.kind==='think'){
+  const el=sceneEl(s,`<div class="center" style="top:250px;font-size:46px;font-weight:500;color:var(--grey)" id="t1">Jadi, LO to Screen <b style="color:var(--navy)">bukan sekadar</b><br>proses menghasilkan video menggunakan AI.</div>
+   <div class="center" style="top:520px;font-size:120px;font-weight:800;color:var(--navy)" id="t2">Ia ialah satu <span style="font-family:Caveat;color:var(--yellow);font-size:150px">cara berfikir.</span></div>
+   <div class="abs" id="brain" style="left:890px;top:770px;width:140px;height:140px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;box-shadow:0 16px 40px rgba(27,63,184,.35)">
+   <svg viewBox="0 0 64 64" width="84" height="84" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M24 12c-6 0-10 5-9 10-5 2-6 9-2 12-2 5 2 11 8 11 1 5 7 7 11 3V14c-2-2-5-3-8-2z"/><path d="M40 12c6 0 10 5 9 10 5 2 6 9 2 12 2 5-2 11-8 11-1 5-7 7-11 3"/><path d="M22 24h6M20 34h8M36 26h6M36 36h8"/></svg></div>`);
+  tw(q(el,'#t1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#t2'),a+2.6,.9,{o:0,s:.6},{o:1,s:1},'back'); tw(q(el,'#brain'),a+3.6,.8,{o:0,s:0},{o:1,s:1},'back');
+  loop(q(el,'#brain'),(e,t)=>{if(t>a+4.4)e.style.transform=`scale(${1+.05*Math.sin((t-a)*3)})`});
+ }
+ if(s.kind==='quote'){
+  const L=[['🎯','Bermula dengan <b>apa yang pelajar perlu belajar</b>,'],['👀','menentukan <b>bagaimana mereka perlu melihatnya</b>,'],['🤖','kemudian barulah memilih <b>bagaimana AI boleh membantu</b><br>kita menghasilkan pengalaman pembelajaran tersebut.']];
+  const el=sceneEl(s,`<div class="abs hand" style="left:200px;top:120px;font-size:190px;color:var(--yellow);line-height:1" id="qm">“</div>
+   <div class="abs" style="left:300px;top:230px;width:1400px">${L.map((x,i)=>`<div class="ql" style="display:flex;gap:34px;align-items:center;margin-bottom:54px;font-size:46px;line-height:1.3;color:var(--ink)">
+   <div style="flex:none;width:110px;height:110px;border-radius:30px;background:#fff;box-shadow:0 12px 30px rgba(27,63,184,.14);display:flex;align-items:center;justify-content:center;font-size:56px">${x[0]}</div><div>${x[1]}</div></div>`).join('')}</div>`);
+  el.querySelectorAll('b').forEach(b=>{b.style.color='var(--navy)';b.style.fontWeight=700});
+  tw(q(el,'#qm'),a+.2,.7,{o:0,s:.3},{o:1,s:1},'back');
+  qa(el,'.ql').forEach((x,i)=>tw(x,a+.8+i*3.2,.8,{o:0,x:-80},{o:1,x:0},'out'));
+ }
+ if(s.kind==='chain'){
+  const el=sceneEl(s,`<div class="center" style="top:230px;font-size:44px;color:var(--grey);font-weight:500" id="c0">Daripada…</div>
+   <div class="abs" style="left:0;right:0;top:420px;display:flex;justify-content:center;align-items:center;gap:26px">
+   ${PH.map((p,i)=>`<div class="pp pill" style="font-size:44px;padding:24px 34px;${i===4?'background:var(--yellow);color:var(--navy2)':''}">${p}</div>${i<4?'<div class="pa" style="font-size:60px;color:var(--yellow);font-weight:800">➜</div>':''}`).join('')}</div>
+   <div class="abs" style="left:0;right:0;top:700px;display:flex;justify-content:center;gap:80px;font-size:32px;font-weight:600;color:var(--navy2)">
+   <div class="ic">🧠 Pengajaran lebih bermakna</div><div class="ic">👥 Pembelajaran lebih aktif</div><div class="ic">📈 Impak lebih besar</div></div>`);
+  tw(q(el,'#c0'),a+.2,.6,{o:0},{o:1});
+  const seq=qa(el,'.pp,.pa'); seq.forEach((x,i)=>tw(x,a+.6+i*.32,.55,{o:0,s:.3,y:40},{o:1,s:1,y:0},'back'));
+  qa(el,'.ic').forEach((x,i)=>tw(x,a+4+i*.45,.6,{o:0,y:30},{o:1,y:0},'back'));
+  const last=qa(el,'.pp')[4]; loop(last,(e,t)=>{if(t>a+4)e.style.transform=`scale(${1+.06*Math.sin((t-a)*4)})`});
+ }
+ if(s.kind==='close'){
+  const el=sceneEl(s,`<div class="center" style="top:250px;font-size:54px;line-height:1.35;font-weight:600;color:var(--ink)" id="k1">Video mungkin <span style="color:var(--grey)">pendek</span>,<br>tetapi apabila perancangannya <span style="color:var(--navy)">tepat</span>,</div>
+   <div class="center" style="top:470px;font-size:74px;line-height:1.2;font-weight:800;color:var(--navy)" id="k2">impaknya kepada pembelajaran<br>boleh menjadi <span style="background:linear-gradient(transparent 62%,var(--yellow) 62%)">jauh lebih besar.</span></div>
+   <div class="center hand" style="top:760px;font-size:80px" id="k3">Same Educator, Bigger Impact ♡</div>`);
+  tw(q(el,'#k1'),a+.3,.8,{o:0,y:30},{o:1,y:0}); tw(q(el,'#k2'),a+2.4,.9,{o:0,s:.7},{o:1,s:1},'back'); tw(q(el,'#k3'),a+4.8,.8,{o:0,y:30,r:-4},{o:1,y:0,r:-2},'back');
+ }
+ if(s.kind==='info'){
+  const el=sceneEl(s,`<img id="ig" src="infographic.webp" style="position:absolute;left:0;top:60px;width:1920px">
+   <div class="center hand" style="top:925px;font-size:64px;color:var(--navy2)" id="e2">Mula dengan pengajaran, bukan dengan prompt. ♡</div>`);
+  const ig=q(el,'#ig'); tw(ig,a,.8,{o:0},{o:1},'lin'); loop(ig,(e,t)=>{const p=Math.max(0,Math.min(1,(t-a)/s.dur)); e.style.transform=`scale(${1+.07*p})`});
+  tw(q(el,'#e2'),a+1.5,.8,{o:0,y:30},{o:1,y:0},'back');
+ }
+}
+
+// ---------------- HUD (logo, phases, timeline) ----------------
+const hud=document.getElementById('hud');
+const stepScenes=SC.filter(s=>s.kind==='step'); const hs=stepScenes[0].start, he=stepScenes[8].start+stepScenes[8].dur;
+show(hud,hs,he); tw(hud,hs,.6,{o:0},{o:1},'lin'); tw(hud,he-.5,.5,{},{o:0},'lin');
+const phs=document.getElementById('phases'); phs.innerHTML=PH.map((p,i)=>`<span data-i="${i}">${p}</span>${i<4?'<span class="ar">➜</span>':''}`).join('');
+const tl=document.getElementById('tl'); const X0=260,X1=1660;
+const xs=Array.from({length:9},(_,i)=>X0+(X1-X0)*i/8);
+tl.innerHTML=`<svg width="1920" height="80"><path id="wave" d="M${X0-120} 39 ${xs.map((x,i)=>`Q ${x-87} ${i%2?20:58} ${x} 39`).join(' ')} T ${X1+120} 39" stroke="#f7c63c" stroke-width="7" fill="none" stroke-linecap="round" opacity=".45"/>
+ <path id="wave2" d="M${X0-120} 39 ${xs.map((x,i)=>`Q ${x-87} ${i%2?20:58} ${x} 39`).join(' ')} T ${X1+120} 39" stroke="#f7c63c" stroke-width="9" fill="none" stroke-linecap="round"/></svg>`+
+ xs.map((x,i)=>`<div class="dot" style="left:${x}px"></div>`).join('');
+const w2=tl.querySelector('#wave2'); const len=w2.getTotalLength(); w2.style.strokeDasharray=len;
+const dots=[...tl.querySelectorAll('.dot')];
+loop(hud,(e,t)=>{ let cur=-1; stepScenes.forEach((s,i)=>{if(t>=s.start)cur=i});
+ dots.forEach((d,i)=>{d.className='dot'+(i<cur?' done':i===cur?' cur':'');
+  const sc=i===cur?1.25+.08*Math.sin(t*5):1; d.style.transform=`scale(${sc})`;});
+ // progress along wave
+ const ci=Math.max(cur,0), s=stepScenes[ci]; const p=E.out(Math.min(1,Math.max(0,(t-s.start)/.9)));
+ const xPrev=ci>0?xs[ci-1]:X0-120; const xNow=xPrev+(xs[ci]-xPrev)*p; const target=(xNow-(X0-120))/(X1-X0+240);
+ w2.style.strokeDashoffset=len*(1-Math.min(1,target));
+ const ph=cur>=0?STEPS[cur].ph:0; phs.querySelectorAll('span[data-i]').forEach(sp=>sp.classList.toggle('on',+sp.dataset.i===ph));
+});
+// background blobs
+loop(document.getElementById('b1'),(e,t)=>e.style.transform=`translate(${Math.sin(t*.3)*60}px,${Math.cos(t*.25)*40}px)`);
+loop(document.getElementById('b2'),(e,t)=>e.style.transform=`translate(${Math.cos(t*.22)*50}px,${Math.sin(t*.3)*60}px)`);
+loop(document.getElementById('b3'),(e,t)=>e.style.transform=`translate(${Math.sin(t*.2)*80}px,${Math.cos(t*.35)*30}px)`);
+seek(0);
+</script></body></html>
