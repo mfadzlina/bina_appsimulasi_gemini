@@ -1,0 +1,48 @@
+NARASI LO TO SCREEN - satu fail audio bagi setiap bahagian
+Namakan fail mengikut nombor: 00.mp3, 01.mp3, ... 14.mp3
+
+[00] Pembukaan
+LO to Screen ialah satu proses yang membantu pendidik membina video pengajaran secara lebih terancang, bermula dengan objektif pembelajaran dan bukannya terus menghasilkan prompt AI.
+
+[01] Langkah 1: LO
+Perjalanan ini bermula dengan Learning Outcome atau LO. Kita perlu jelas terlebih dahulu, selepas menonton video ini, apakah perkara yang pelajar sepatutnya tahu, faham atau boleh lakukan.
+
+[02] Langkah 2: Visual Evidence
+Selepas LO ditentukan, kita memilih Visual Evidence. Maksudnya, apakah visual yang paling jelas boleh membantu pelajar melihat dan memahami konsep tersebut. Kita tidak memilih visual sekadar untuk mencantikkan video, tetapi visual yang benar-benar menyokong pembelajaran.
+
+[03] Langkah 3: Strategi
+Seterusnya, kita menentukan strategi pengajaran yang sesuai. Adakah kita mahu menerangkan konsep, membandingkan dua keadaan, menunjukkan sesuatu proses atau menyelesaikan satu masalah?
+
+[04] Langkah 4: Scene Map
+Daripada strategi tersebut, kita mula membina Scene Map. Kandungan dipecahkan kepada beberapa scene pendek supaya setiap scene mempunyai satu fokus yang jelas. Untuk video berasaskan Google Flow, satu scene biasanya dirancang sekitar lapan saat.
+
+[05] Langkah 5: AI Checkpoints
+Dalam proses ini, AI bukan sekadar digunakan untuk menghasilkan video. Kita menggunakan AI Checkpoints untuk berbincang, menyemak dan memperhalusi keputusan pengajaran sebelum bergerak ke langkah seterusnya.
+
+[06] Langkah 6: Continuity
+Selepas Scene Map siap, kita memastikan continuity antara setiap scene. Watak, persekitaran, arah visual dan gaya persembahan perlu konsisten supaya video terasa seperti satu perjalanan pembelajaran yang lengkap, bukannya beberapa klip yang terpisah.
+
+[07] Langkah 7: Google Flow
+Barulah kita masuk ke peringkat Google Flow, di mana setiap scene dijana satu demi satu berdasarkan perancangan yang telah dibuat.
+
+[08] Langkah 8: Edit
+Klip yang siap kemudian dibawa ke proses editing, contohnya menggunakan CapCut. Di sinilah kita boleh menambah voice over, caption, overlay, animasi atau elemen sokongan yang membantu pelajar memberi perhatian kepada perkara penting.
+
+[09] Langkah 9: Video siap
+Akhirnya, kita memperoleh sebuah video PdP yang siap digunakan.
+
+[10] Cara berfikir
+Jadi, LO to Screen sebenarnya bukan sekadar proses menghasilkan video menggunakan AI. Ia ialah satu cara berfikir.
+
+[11] Petikan
+Bermula dengan apa yang pelajar perlu belajar, menentukan bagaimana mereka perlu melihatnya, kemudian barulah memilih bagaimana AI boleh membantu kita menghasilkan pengalaman pembelajaran tersebut.
+
+[12] Idea ke Impact
+Daripada Idea, kepada Plan, Create, Teach dan akhirnya Impact.
+
+[13] Penutup
+Video mungkin pendek, tetapi apabila perancangannya tepat, impaknya kepada pembelajaran boleh menjadi jauh lebih besar.
+
+[14] Akhir
+Video kecil, impak besar.
+
