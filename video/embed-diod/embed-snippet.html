@@ -1,0 +1,46 @@
+<!-- ============================================================
+  EMBED: Contoh video Fungsi Diod (Kurang Kuat vs Kuat)
+  Letak blok ini SELEPAS dua kad "KURANG KUAT" / "KUAT"
+  dan SEBELUM "Cuba: pilih bukti visual yang lebih kuat".
+  Folder "videos/" mesti dimuat naik bersama index.html ke Netlify.
+============================================================= -->
+<style>
+  .vid-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:22px 0 34px}
+  .vid-card{border-radius:18px;padding:16px;border:1.5px solid;display:flex;flex-direction:column;gap:12px}
+  .vid-card.lemah{background:#fdecea;border-color:#f5c6c0}
+  .vid-card.kuat{background:#e6f5ef;border-color:#a9dcc6}
+  .vid-card .lbl{font-weight:800;letter-spacing:.12em;font-size:.8rem;text-transform:uppercase}
+  .vid-card.lemah .lbl{color:#d9534f}
+  .vid-card.kuat .lbl{color:#1f9d6b}
+  .vid-card .frame{background:#1d1d1d;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;aspect-ratio:16/11}
+  .vid-card video{width:100%;height:100%;object-fit:contain;display:block}
+  .vid-card p{margin:0;font-size:.95rem;line-height:1.5;color:#3d4a45}
+  @media (max-width:760px){.vid-compare{grid-template-columns:1fr}}
+</style>
+
+<h3 style="margin:28px 0 4px">Tonton perbezaannya</h3>
+<p style="margin:0;color:#5b6863">Tutup bunyi (mute) dan tonton kedua-dua video. Yang mana satu pelajar masih faham tanpa suara?</p>
+
+<div class="vid-compare">
+  <div class="vid-card lemah">
+    <span class="lbl">Kurang kuat</span>
+    <div class="frame">
+      <video controls playsinline preload="metadata"
+             poster="videos/03_Fungsi_Diod_BuktiVisual_KurangKuat_16x9.jpg">
+        <source src="videos/03_Fungsi_Diod_BuktiVisual_KurangKuat_16x9.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>Hanya teks penerangan tentang diod. Tanpa suara, pelajar cuma <b>membaca</b>, bukan <b>melihat</b> apa yang diod lakukan.</p>
+  </div>
+
+  <div class="vid-card kuat">
+    <span class="lbl">Kuat</span>
+    <div class="frame">
+      <video controls playsinline preload="metadata"
+             poster="videos/02_Fungsi_Diod_PaperCutout_4x5.jpg">
+        <source src="videos/02_Fungsi_Diod_PaperCutout_4x5.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>Litar sebenar: arah diod, bateri dan mentol. Pelajar <b>nampak</b> kesan diod dalam litar walaupun tanpa suara.</p>
+  </div>
+</div>
